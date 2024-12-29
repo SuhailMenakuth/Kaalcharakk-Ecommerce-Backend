@@ -1,0 +1,17 @@
+# Ignore Visual Studio files
+.vs/
+.vs2019/
+.vs2017/
+
+# Ignore build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.userprefs
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
