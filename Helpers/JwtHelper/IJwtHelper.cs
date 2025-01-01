@@ -1,6 +1,6 @@
 ﻿using Kaalcharakk.Models;
 
-namespace Kaalcharakk.Helpers
+namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
 {
     public interface IJwtHelper
     {

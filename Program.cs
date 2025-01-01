@@ -1,13 +1,20 @@
 using Kaalcharakk.Configuration;
-using Kaalcharakk.Helpers;
+using Kaalcharakk.Helpers.CloudinaryHelper;
+using Kaalcharakk.Helpers.JwtHelper.JwtHelper;
 using Kaalcharakk.Mapper;
-using Kaalcharakk.Models;
 using Kaalcharakk.Repositories.AuthRepository;
-using Kaalcharakk.Repositories.AuthRepository;
+using Kaalcharakk.Repositories.ProductRepository;
 using Kaalcharakk.Services.Authentication;
+using Kaalcharakk.Services.ProductService;
+
+
+
+//using Kaalcharakk.Repositories.AuthRepository;
+//using Kaalcharakk.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace Kaalcharakk
@@ -30,12 +37,50 @@ namespace Kaalcharakk
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+            builder.Services.AddScoped<ICloudinaryHelper, CloudinaryHelper>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
 
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "Kaalcharakk", Version = "v1" });
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter 'Bearer' [space] and then your token"
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
+
+
+
+
+
+
+
+
 
             // User Secrets configuration (only for local development)
             builder.Configuration.AddUserSecrets<Program>();

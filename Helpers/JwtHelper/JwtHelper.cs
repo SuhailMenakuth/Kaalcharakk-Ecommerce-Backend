@@ -1,4 +1,5 @@
-﻿using Kaalcharakk.Models;
+﻿using Kaalcharakk.Helpers.JwtHelper.JwtHelper;
+using Kaalcharakk.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -6,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Kaalcharakk.Helpers
+namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
 {
     public class JwtHelper : IJwtHelper
     {

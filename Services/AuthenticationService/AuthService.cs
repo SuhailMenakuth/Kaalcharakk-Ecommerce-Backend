@@ -2,7 +2,7 @@
 using BCrypt.Net;
 using Kaalcharakk.Configuration;
 using Kaalcharakk.Dtos.AuthenticationDtos;
-using Kaalcharakk.Helpers;
+using Kaalcharakk.Helpers.JwtHelper.JwtHelper;
 using Kaalcharakk.Models;
 using Kaalcharakk.Repositories.AuthRepository;
 using Microsoft.AspNetCore.Identity;
@@ -35,12 +35,7 @@ namespace Kaalcharakk.Services.Authentication
         {
             try
             {
-                //if (string.IsNullOrEmpty(registerDto.Email))
-                //{
-                //    throw new Exception("Email cannot be null or empty");
-                //}
-                
-
+               
                 //if (await _context.Users.AnyAsync(u => u.Email == registerDto.Email))
                 if (await _authRepository.GetUserByEmailAsync(registerDto.Email) != null)
                 {
