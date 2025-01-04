@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
 using Kaalcharakk.Dtos.AuthenticationDtos;
 using Kaalcharakk.Dtos.ProductDtos;
 using Kaalcharakk.Helpers.CloudinaryHelper;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
-using Kaalcharakk.Models.Product;
 using Kaalcharakk.Repositories.ProductRepository;
+using Microsoft.AspNetCore.Hosting.Server;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Kaalcharakk.Services.ProductService
 {
@@ -21,53 +24,30 @@ namespace Kaalcharakk.Services.ProductService
             _cloudinaryHelper = cloudinaryHelper;
         }
 
-        public async Task<bool> AddProductServiceAsync(ProductDto productDto,ProductImageDto productimagedto, ProductSizeListDto productsizelistdto)
+        public async Task<ApiResponse<string>> AddProductServiceAsync(AddProductDto addproductdto,AddProductImageDto addproductimagedto)
         {
             try
             {
-                if (productimagedto.Images == null || !productimagedto.Images.Any())
+                
+                var imageUrl = await _cloudinaryHelper.UploadProductImageAsyn(addproductimagedto.Image);
+
+                if(imageUrl == null)
                 {
-                    throw new ArgumentException("No images provided for upload.", nameof(productimagedto.Images));
+                    return new ApiResponse<string>(503, "internal server error  ",error:"internal server error cloudinary updation error ");
                 }
-                 if(productsizelistdto.ProductSizes == null || !productsizelistdto.ProductSizes.Any())
-                { 
-                    throw new Exception("ProductSizes in ProductListDto is null or empty.");
-                }
-
-                var imageUrls = new List<string>();
-
-                foreach (var imageFile in productimagedto.Images)
+                var product = _mapper.Map<Product>(addproductdto);
+                if(product == null)
                 {
-                    var imageUrl = await _cloudinaryHelper.UploadProductImageAsyn(imageFile);
-                    imageUrls.Add(imageUrl);
+                    return new ApiResponse<string>(501, "internal server error", error: "Maping of your product details to actual product details ");
                 }
-
-                var product = _mapper.Map<Product>(productDto);
-                product.ProductImages = imageUrls.Select(url => new ProductImage { ImageUrl = url }).ToList();
-                foreach (var size in productsizelistdto.ProductSizes)
-                {
-                    Console.WriteLine($"Size: {size.Size}, Stock: {size.StockQuantity}");
-                }
-                product.ProductSizes = productsizelistdto.ProductSizes.Select(size => new ProductSize
-                {   
-                    Size = size.Size,
-                    StockQuantity = size.StockQuantity
-                }).ToList();
-
-
-                //product.ProductImages = imageUrls.Select(url => new ProductImage { ImageUrl = url }).ToList();
-
-                product.StockQuantity = product.ProductSizes.Sum(size => size.StockQuantity);
+                product.ImageUrl = imageUrl;
                 var result = await _productRepository.AddProductAsync(product);
                 if (result != null)
-                {
-                    return true;
+                {  
+                return new ApiResponse<string>(200,"success" ,error: "Producted added succesfully");   
                 }
 
-                return false;
-
-               
-               
+                    return new ApiResponse<string>(500, "internal server error  ", error: "error occured during the updation of the database");
                
             }
             catch (Exception ex)
@@ -77,6 +57,105 @@ namespace Kaalcharakk.Services.ProductService
 
         }
 
-       
+      public async  Task<ApiResponse<ProductViewDto>> GetProductByIdServiceAsync(int id)
+        {
+            try
+            {
+                var RetrivedProduct = await _productRepository.GetProductByIdAsync(id);
+
+                if (RetrivedProduct == null)
+                {
+
+                    return new ApiResponse<ProductViewDto>(400, "error",error: "Cant find a product with this id");
+
+                }
+                //var result = _mapper.Map<ProductViewDto>(RetrivedProduct);
+                //if (result == null)
+                //{
+                //    return new ApiResponse<ProductViewDto>(500, "internal server error", error: "retrived product mapping failed ");
+                //}
+                var result = new ProductViewDto
+                {
+                    ProductId = RetrivedProduct.ProductId,
+                    Category = RetrivedProduct.Category.Name,
+                    Name = RetrivedProduct.Name,
+                    Price = RetrivedProduct.Price,
+                    ImageUrl = RetrivedProduct.ImageUrl,
+                    Color = RetrivedProduct.Color,
+                    Stock = RetrivedProduct.Stock,
+                    Offer = RetrivedProduct.Offer,
+                    OfferStartingDate = RetrivedProduct.OfferStartingDate,
+                    OfferEndingDate = RetrivedProduct.OfferEndingDate,
+                    IsActive = RetrivedProduct.IsActive
+                };
+
+                return new ApiResponse<ProductViewDto>(200, "success",result);
+            }
+            catch (Exception ex)
+            {
+                throw;
+                //new Exception("An error occurred while fetching the product", ex);
+            }
+        }
+
+        public async Task<List<ProductViewDto>> GetAllProductsServiceAsync()
+        {
+            try
+            {
+                //List<ProductViewDto> products = new List<ProductViewDto>();
+                 var products  = await _productRepository.GetAllProductsAsync();
+
+                var AllProductList = products.Select(p =>
+
+                new ProductViewDto
+                {
+
+                    ProductId = p.ProductId,
+                    Category = p.Category.Name,
+                    Name = p.Name,
+                    Price = p.Price,
+                    ImageUrl = p.ImageUrl,
+                    Color = p.Color,
+                    Stock = p.Stock,
+                    Offer = p.Offer,
+                    OfferStartingDate = p.OfferStartingDate,
+                    OfferEndingDate = p.OfferEndingDate,
+                    IsActive = p.IsActive
+                    
+
+                } ).ToList();
+
+                return AllProductList;
+
+             
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+        }
+
+        public async Task<List<ProductViewDto>> GetProductsByFilterServiceAsync(ProductFilterDto filterDto)
+        {
+            var products = await _productRepository.GetProductsByFilterAsync(filterDto);
+
+            return products.Select(product => new ProductViewDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Category = product.Category.Name, 
+                Price = product.Price,
+                ImageUrl = product.ImageUrl,
+                Stock = product.Stock,
+                Color = product.Color,
+                Offer = product.Offer,
+                OfferStartingDate = product.OfferStartingDate,
+                OfferEndingDate = product.OfferEndingDate,
+                IsActive = product.IsActive
+            }).ToList();
+        }
+
+
     }
 }

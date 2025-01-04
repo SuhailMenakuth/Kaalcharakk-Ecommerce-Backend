@@ -4,6 +4,7 @@ using Kaalcharakk.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kaalcharakk.Migrations
 {
     [DbContext(typeof(KaalcharakkDbContext))]
-    partial class KaalcharakkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103105357_UpdatedProductColor")]
+    partial class UpdatedProductColor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,7 +144,7 @@ namespace Kaalcharakk.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 1, 3, 12, 12, 56, 201, DateTimeKind.Utc).AddTicks(4568));
+                        .HasDefaultValue(new DateTime(2025, 1, 3, 10, 53, 53, 250, DateTimeKind.Utc).AddTicks(623));
 
                     b.Property<string>("Email")
                         .IsRequired()

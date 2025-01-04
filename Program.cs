@@ -2,6 +2,7 @@ using Kaalcharakk.Configuration;
 using Kaalcharakk.Helpers.CloudinaryHelper;
 using Kaalcharakk.Helpers.JwtHelper.JwtHelper;
 using Kaalcharakk.Mapper;
+using Kaalcharakk.Middleware;
 using Kaalcharakk.Repositories.AuthRepository;
 using Kaalcharakk.Repositories.ProductRepository;
 using Kaalcharakk.Services.Authentication;
@@ -41,7 +42,7 @@ namespace Kaalcharakk
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
 
-
+            builder.Services.AddLogging();
             builder.Services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -127,7 +128,7 @@ namespace Kaalcharakk
             // Add authentication before authorization
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseMiddleware<UserIdentificationMiddleWare>();
             app.MapControllers();
 
             app.Run();

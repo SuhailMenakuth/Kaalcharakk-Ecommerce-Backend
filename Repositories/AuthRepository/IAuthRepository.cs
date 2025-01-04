@@ -7,5 +7,10 @@ namespace Kaalcharakk.Repositories.AuthRepository
         Task<User?> GetUserByEmailAsync(string email);
         Task AddUserAsync(User userr);
         Task<bool> GetUserByPhoneAsync(string phone);
+
+
+
+
+
     }
 }

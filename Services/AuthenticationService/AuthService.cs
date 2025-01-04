@@ -59,7 +59,7 @@ namespace Kaalcharakk.Services.Authentication
                
                 var user = _mapper.Map<User>(registerDto);
                 user.CreatedAt = DateTime.UtcNow; 
-                user.RoleId = 2;
+                user.RoleId = 1;
                 user.IsActived = true;
 
 

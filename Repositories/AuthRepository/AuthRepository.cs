@@ -37,7 +37,6 @@ namespace Kaalcharakk.Repositories.AuthRepository
             await _context.Users.AddAsync(user);
             Console.WriteLine($"Before saving: IsActived = {user.IsActived}");
             await _context.SaveChangesAsync();
-
         }
 
      

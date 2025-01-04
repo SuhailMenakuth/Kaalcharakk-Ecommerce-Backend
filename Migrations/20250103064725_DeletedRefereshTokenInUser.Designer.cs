@@ -4,6 +4,7 @@ using Kaalcharakk.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kaalcharakk.Migrations
 {
     [DbContext(typeof(KaalcharakkDbContext))]
-    partial class KaalcharakkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103064725_DeletedRefereshTokenInUser")]
+    partial class DeletedRefereshTokenInUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,10 +64,6 @@ namespace Kaalcharakk.Migrations
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -141,7 +140,7 @@ namespace Kaalcharakk.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 1, 3, 12, 12, 56, 201, DateTimeKind.Utc).AddTicks(4568));
+                        .HasDefaultValue(new DateTime(2025, 1, 3, 6, 47, 24, 428, DateTimeKind.Utc).AddTicks(8783));
 
                     b.Property<string>("Email")
                         .IsRequired()

@@ -4,6 +4,7 @@ using Kaalcharakk.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kaalcharakk.Migrations
 {
     [DbContext(typeof(KaalcharakkDbContext))]
-    partial class KaalcharakkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250101104623_CartAndCartItmeCreated")]
+    partial class CartAndCartItmeCreated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,51 @@ namespace Kaalcharakk.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Kaalcharakk.Models.Cart", b =>
+                {
+                    b.Property<int>("CartId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartId"));
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CartId");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("Kaalcharakk.Models.CartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CartId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CartId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CartItems");
+                });
 
             modelBuilder.Entity("Kaalcharakk.Models.Category", b =>
                 {
@@ -32,22 +80,23 @@ namespace Kaalcharakk.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("categories");
 
                     b.HasData(
                         new
                         {
                             CategoryId = 1,
-                            Name = "Male"
+                            Name = "Men"
                         },
                         new
                         {
                             CategoryId = 2,
-                            Name = "Female"
+                            Name = "Women"
                         });
                 });
 
@@ -62,16 +111,9 @@ namespace Kaalcharakk.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -81,14 +123,8 @@ namespace Kaalcharakk.Migrations
                     b.Property<decimal>("Offer")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime?>("OfferEndingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("OfferStartingDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
@@ -121,12 +157,12 @@ namespace Kaalcharakk.Migrations
                         new
                         {
                             RoleId = 1,
-                            RoleName = "User"
+                            RoleName = "Admin"
                         },
                         new
                         {
                             RoleId = 2,
-                            RoleName = "Admin"
+                            RoleName = "Customer"
                         });
                 });
 
@@ -141,7 +177,7 @@ namespace Kaalcharakk.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 1, 3, 12, 12, 56, 201, DateTimeKind.Utc).AddTicks(4568));
+                        .HasDefaultValue(new DateTime(2025, 1, 1, 10, 45, 58, 23, DateTimeKind.Utc).AddTicks(6546));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -170,8 +206,8 @@ namespace Kaalcharakk.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -194,12 +230,42 @@ namespace Kaalcharakk.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Kaalcharakk.Models.Cart", b =>
+                {
+                    b.HasOne("Kaalcharakk.Models.User", "User")
+                        .WithOne("Cart")
+                        .HasForeignKey("Kaalcharakk.Models.Cart", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Kaalcharakk.Models.CartItem", b =>
+                {
+                    b.HasOne("Kaalcharakk.Models.Cart", "Cart")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Kaalcharakk.Models.Product", "Product")
+                        .WithMany("CartItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("Kaalcharakk.Models.Product", b =>
                 {
                     b.HasOne("Kaalcharakk.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -210,15 +276,30 @@ namespace Kaalcharakk.Migrations
                     b.HasOne("Kaalcharakk.Models.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("Kaalcharakk.Models.Cart", b =>
+                {
+                    b.Navigation("CartItems");
+                });
+
             modelBuilder.Entity("Kaalcharakk.Models.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("Kaalcharakk.Models.Product", b =>
+                {
+                    b.Navigation("CartItems");
+                });
+
+            modelBuilder.Entity("Kaalcharakk.Models.User", b =>
+                {
+                    b.Navigation("Cart");
                 });
 #pragma warning restore 612, 618
         }

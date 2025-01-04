@@ -4,6 +4,7 @@ using Kaalcharakk.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kaalcharakk.Migrations
 {
     [DbContext(typeof(KaalcharakkDbContext))]
-    partial class KaalcharakkDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250101072558_UpdatedProducAndCategory")]
+    partial class UpdatedProducAndCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,22 +35,23 @@ namespace Kaalcharakk.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("categories");
 
                     b.HasData(
                         new
                         {
                             CategoryId = 1,
-                            Name = "Male"
+                            Name = "Men"
                         },
                         new
                         {
                             CategoryId = 2,
-                            Name = "Female"
+                            Name = "Women"
                         });
                 });
 
@@ -62,16 +66,9 @@ namespace Kaalcharakk.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Color")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -81,14 +78,8 @@ namespace Kaalcharakk.Migrations
                     b.Property<decimal>("Offer")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<DateTime?>("OfferEndingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("OfferStartingDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
@@ -121,12 +112,12 @@ namespace Kaalcharakk.Migrations
                         new
                         {
                             RoleId = 1,
-                            RoleName = "User"
+                            RoleName = "Admin"
                         },
                         new
                         {
                             RoleId = 2,
-                            RoleName = "Admin"
+                            RoleName = "Customer"
                         });
                 });
 
@@ -141,7 +132,7 @@ namespace Kaalcharakk.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2025, 1, 3, 12, 12, 56, 201, DateTimeKind.Utc).AddTicks(4568));
+                        .HasDefaultValue(new DateTime(2025, 1, 1, 7, 25, 57, 851, DateTimeKind.Utc).AddTicks(5351));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -170,8 +161,8 @@ namespace Kaalcharakk.Migrations
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
@@ -199,7 +190,7 @@ namespace Kaalcharakk.Migrations
                     b.HasOne("Kaalcharakk.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -210,7 +201,7 @@ namespace Kaalcharakk.Migrations
                     b.HasOne("Kaalcharakk.Models.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
