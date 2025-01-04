@@ -28,7 +28,6 @@ namespace Kaalcharakk.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal Offer { get; set; } = 0;
         public DateTime? OfferStartingDate { get; set; } = DateTime.UtcNow;
-       
         public DateTime? OfferEndingDate {  get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
 

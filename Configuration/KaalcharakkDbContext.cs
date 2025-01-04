@@ -20,11 +20,6 @@ namespace Kaalcharakk.Configuration
         public DbSet<Role> Roles { get; set; }
 
         public DbSet<Product> Products { get; set; }
-       
-
-
-
-
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -36,8 +31,13 @@ namespace Kaalcharakk.Configuration
                 entity.HasOne(u => u.Role)
                 .WithMany()
                 .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
                 //.OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(u => u.Cart)
+                .WithOne(c => c.User)
+                .HasForeignKey<User>(u => u.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(u => u.RoleId)
                .HasDefaultValue(2);
@@ -48,21 +48,24 @@ namespace Kaalcharakk.Configuration
 
                 entity.Property(u => u.CreatedAt)
                 .HasDefaultValue(DateTime.UtcNow);
-                    
+
                 entity.HasIndex(u => u.Email)
                 .IsUnique();
 
                 entity.HasIndex(u => u.Phone)
                 .IsUnique();
             });
+
+
+            // category and product 
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.Products)
                 .WithOne(p => p.Category)
                 .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Role>()
                 .HasData(
-                new Role { RoleId = 1 , RoleName = "User"},
-                new Role { RoleId = 2 , RoleName = "Admin"}
+                new Role { RoleId = 1, RoleName = "User" },
+                new Role { RoleId = 2, RoleName = "Admin" }
                 );
 
             modelBuilder.Entity<Category>().HasData(
@@ -71,9 +74,29 @@ namespace Kaalcharakk.Configuration
                );
 
 
-            // category
+            //cart and user 
+            modelBuilder.Entity<Cart>()
+                .HasOne(c => c.User)
+                .WithOne(u => u.Cart)
+                .HasForeignKey<Cart>(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+           
+            // cartItem and Cart 
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.Cart)
+                .WithMany(c => c.Items)
+                .HasForeignKey(ci => ci.CartId)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            // cartItem and Product 
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.Product)
+                .WithMany()
+                .HasForeignKey(ci => ci.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            
 
         }
 
