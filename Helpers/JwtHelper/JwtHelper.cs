@@ -41,9 +41,25 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
                 // Define claims
                 var claims = new[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role.RoleName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                //    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                //    new Claim(ClaimTypes.Role, user.Role.RoleName),
+                //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+
+
+                //    new Claim(ClaimTypes.NameIdentifier,user.UserId.ToString()),
+                //new Claim(ClaimTypes.Name,user.Name),
+                //new Claim(ClaimTypes.Role,user.Role),
+                //new Claim(ClaimTypes.Email,user.Email),
+
+
+
+                     //new Claim(JwtRegisteredClaimNames.Sub, user.Email), // user email (subject)
+    new Claim(ClaimTypes.Role, user.Role.RoleName),      // user role (role name)
+    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
+
+    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // user ID (user identifier)
+    new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName), // user's full name
+    new Claim(ClaimTypes.Email, user.Email), // user's email (email claim)
                 };
 
                 // Create the token

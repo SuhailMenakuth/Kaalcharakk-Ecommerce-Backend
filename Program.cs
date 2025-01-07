@@ -4,8 +4,10 @@ using Kaalcharakk.Helpers.JwtHelper.JwtHelper;
 using Kaalcharakk.Mapper;
 using Kaalcharakk.Middleware;
 using Kaalcharakk.Repositories.AuthRepository;
+using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.ProductRepository;
 using Kaalcharakk.Services.Authentication;
+using Kaalcharakk.Services.CartService;
 using Kaalcharakk.Services.ProductService;
 
 
@@ -41,6 +43,8 @@ namespace Kaalcharakk
             builder.Services.AddScoped<ICloudinaryHelper, CloudinaryHelper>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICartRepository, CartRepository>();
+            builder.Services.AddScoped<ICartService, CartService>();
 
             builder.Services.AddLogging();
             builder.Services.AddControllers();
