@@ -55,11 +55,21 @@ namespace Kaalcharakk.Controllers
 
         
         [HttpPost("decrease/{productId}")]
+        [Authorize]
         public async Task<IActionResult> DecreaseQuantity( int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             await _cartService.UpdateItemQuantityAsync(userId, productId, increase: false);
             return Ok();
+        }
+
+        [HttpDelete("clear")]
+        [Authorize]
+        public async Task<IActionResult> ClearCart()
+        {
+            var userId = int.Parse(HttpContext.Items["UserId"].ToString());
+            await _cartService.RemoveAllItemsAsync(userId);
+            return Ok("All items have been removed from the cart.");
         }
     }
 

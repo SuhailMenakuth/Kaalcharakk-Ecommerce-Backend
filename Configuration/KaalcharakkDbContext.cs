@@ -26,9 +26,11 @@ namespace Kaalcharakk.Configuration
         public DbSet<Cart> Carts { get; set; }
 
         public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<WishlistItem> WishlistItems { get; set; }
 
 
-        
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -105,7 +107,27 @@ namespace Kaalcharakk.Configuration
                 .HasForeignKey(ci => ci.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
+            // User and Wishlist (One-to-One)
+            modelBuilder.Entity<Wishlist>()
+                .HasOne(w => w.User)
+                .WithOne(u => u.Wishlist)
+                .HasForeignKey<Wishlist>(w => w.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Wishlist and WishlistItem (One-to-Many)
+            modelBuilder.Entity<WishlistItem>()
+                .HasOne(wi => wi.Wishlist)
+                .WithMany(w => w.Items)
+                .HasForeignKey(wi => wi.WishlistId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // WishlistItem and Product (One-to-One)
+            modelBuilder.Entity<WishlistItem>()
+                .HasOne(wi => wi.Product)
+                .WithMany()
+                .HasForeignKey(wi => wi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
 
         }
 

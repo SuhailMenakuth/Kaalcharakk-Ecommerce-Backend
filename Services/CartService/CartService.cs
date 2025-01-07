@@ -117,5 +117,16 @@ namespace Kaalcharakk.Services.CartService
 
             await _cartRepository.UpdateCartAsync(cart);
         }
+
+        public async Task RemoveAllItemsAsync(int userId)
+        {
+            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+            if (cart == null) throw new Exception("Cart not found.");
+
+            // Remove all items from the cart
+            cart.Items.Clear();
+
+            await _cartRepository.UpdateCartAsync(cart);
+        }
     }
 }

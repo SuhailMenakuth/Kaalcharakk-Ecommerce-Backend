@@ -42,6 +42,7 @@ namespace Kaalcharakk.Models
         
         public Role Role { get; set; }
         public Cart Cart { get; set; }
+        public Wishlist Wishlist { get; set; }
 
 
 
