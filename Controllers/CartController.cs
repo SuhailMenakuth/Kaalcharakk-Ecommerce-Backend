@@ -43,6 +43,24 @@ namespace Kaalcharakk.Controllers
             await _cartService.RemoveItemAsync(userId, productId);
             return NoContent();
         }
+
+        [HttpPost("increase/{productId}")]
+        [Authorize(Roles ="User")]
+        public async Task<IActionResult> IncreaseQuantity( int productId)
+        {
+            var userId = int.Parse(HttpContext.Items["UserId"].ToString());
+            await _cartService.UpdateItemQuantityAsync(userId, productId, increase: true);
+            return Ok();
+        }
+
+        
+        [HttpPost("decrease/{productId}")]
+        public async Task<IActionResult> DecreaseQuantity( int productId)
+        {
+            var userId = int.Parse(HttpContext.Items["UserId"].ToString());
+            await _cartService.UpdateItemQuantityAsync(userId, productId, increase: false);
+            return Ok();
+        }
     }
 
 }

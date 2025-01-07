@@ -81,5 +81,41 @@ namespace Kaalcharakk.Services.CartService
             cart.Items.Remove(cartItem);
             await _cartRepository.UpdateCartAsync(cart);
         }
+
+        public async Task UpdateItemQuantityAsync(int userId, int productId, bool increase)
+        {
+            var product = await _productRepository.GetProductByIdAsync(productId);
+            if (product == null || product.Stock < 1)
+                throw new Exception("Product not available or insufficient stock.");
+
+            var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+            if (cart == null) throw new Exception("Cart not found.");
+
+            var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
+            if (cartItem == null) throw new Exception("Item not found in cart.");
+
+            // If increasing, just add 1 to the quantity
+            if (increase)
+            {
+                cartItem.Quantity += 1;
+
+                if (cartItem.Quantity > product.Stock)
+                    throw new Exception("Insufficient stock.");
+            }
+            // If decreasing, reduce the quantity by 1 (ensure it doesn't go below 1)
+            else
+            {
+                if (cartItem.Quantity > 1)
+                {
+                    cartItem.Quantity -= 1;
+                }
+                else
+                {
+                    throw new Exception("Quantity cannot be less than 1.");
+                }
+            }
+
+            await _cartRepository.UpdateCartAsync(cart);
+        }
     }
 }

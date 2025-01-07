@@ -7,5 +7,6 @@ namespace Kaalcharakk.Services.CartService
         Task<CartResponseDto> GetCartAsync(int userId);
         Task AddOrUpdateItemAsync(int userId, CartItemRequestDto requestDto);
         Task RemoveItemAsync(int userId, int productId);
+        Task UpdateItemQuantityAsync(int userId, int quantity , bool increase);
     }
 }
