@@ -6,9 +6,12 @@ using Kaalcharakk.Middleware;
 using Kaalcharakk.Repositories.AuthRepository;
 using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.ProductRepository;
+using Kaalcharakk.Repositories.WishlistRepository;
 using Kaalcharakk.Services.Authentication;
 using Kaalcharakk.Services.CartService;
 using Kaalcharakk.Services.ProductService;
+using Kaalcharakk.Services.WishlistServices;
+
 
 
 
@@ -45,6 +48,8 @@ namespace Kaalcharakk
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<ICartRepository, CartRepository>();
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+            builder.Services.AddScoped<IWishlistService, WishlistService>();
 
             builder.Services.AddLogging();
             builder.Services.AddControllers();

@@ -90,7 +90,7 @@ namespace Kaalcharakk.Configuration
                 .HasOne(c => c.User)
                 .WithOne(u => u.Cart)
                 .HasForeignKey<Cart>(c => c.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
            
             // cartItem and Cart 
@@ -105,28 +105,28 @@ namespace Kaalcharakk.Configuration
                 .HasOne(ci => ci.Product)
                 .WithMany()
                 .HasForeignKey(ci => ci.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // User and Wishlist (One-to-One)
             modelBuilder.Entity<Wishlist>()
                 .HasOne(w => w.User)
                 .WithOne(u => u.Wishlist)
                 .HasForeignKey<Wishlist>(w => w.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Wishlist and WishlistItem (One-to-Many)
             modelBuilder.Entity<WishlistItem>()
                 .HasOne(wi => wi.Wishlist)
                 .WithMany(w => w.Items)
                 .HasForeignKey(wi => wi.WishlistId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // WishlistItem and Product (One-to-One)
             modelBuilder.Entity<WishlistItem>()
                 .HasOne(wi => wi.Product)
                 .WithMany()
                 .HasForeignKey(wi => wi.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }
