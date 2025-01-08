@@ -32,6 +32,7 @@ namespace Kaalcharakk.Models
         public bool IsActive { get; set; } = true;
 
         public Category Category { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } 
 
     }
 }

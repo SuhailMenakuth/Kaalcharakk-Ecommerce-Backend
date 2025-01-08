@@ -44,8 +44,9 @@ namespace Kaalcharakk.Models
         public Cart Cart { get; set; }
         public Wishlist Wishlist { get; set; }
 
+        public virtual ICollection<ShippingAddress> ShippingAddresses { get; set; }
 
-
+        public virtual ICollection<Order> Orders { get; set; }
 
 
     }

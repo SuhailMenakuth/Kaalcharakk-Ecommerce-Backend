@@ -1,6 +1,7 @@
 ﻿using Kaalcharakk.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Security.Cryptography.Xml;
 
 namespace Kaalcharakk.Configuration
@@ -28,7 +29,12 @@ namespace Kaalcharakk.Configuration
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Wishlist> Wishlists { get; set; }
         public DbSet<WishlistItem> WishlistItems { get; set; }
+        public DbSet<ShippingAddress> ShippingAddresses { get; set; }
 
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderItem> OrdersItems { get; set; }
+        public DbSet<ShippingAddress> shippingAddresses { get; set; }
 
 
 
@@ -127,6 +133,51 @@ namespace Kaalcharakk.Configuration
                 .WithMany()
                 .HasForeignKey(wi => wi.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ShippingAddress>()
+                 .HasOne(r => r.User)
+                 .WithMany(r => r.ShippingAddresses)
+                 .HasForeignKey(k => k.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(r => r.User)
+                .WithMany(r => r.Orders)
+                .HasForeignKey(k => k.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(r => r.ShippingAddress)
+                .WithMany()
+                .HasForeignKey(k => k.ShippingAddressId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Order>()
+                .Property(p => p.OrderStatus)
+                .HasConversion(new EnumToStringConverter<OrderStatus>());
+
+            modelBuilder.Entity<Order>()
+                .Property(p => p.TotalAmount)
+                .HasColumnType("decimal(12.2)");
+
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(r => r.Order)
+                .WithMany(r => r.OrderItems)
+                .HasForeignKey(k => k.OrderId);
+
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(r => r.Product)
+                .WithMany(r => r.OrderItems)
+                .HasForeignKey(k => k.ProductId);
+
+            modelBuilder.Entity<OrderItem>()
+                .Property(p => p.Price)
+                .HasColumnType("decimal(10,2)");
+
+            modelBuilder.Entity<OrderItem>()
+                .Property(p => p.TotalPrice)
+                .HasColumnType("decimal(12,2)");
+
 
 
         }
