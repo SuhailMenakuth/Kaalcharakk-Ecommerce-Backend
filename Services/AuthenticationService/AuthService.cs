@@ -87,6 +87,7 @@ namespace Kaalcharakk.Services.Authentication
                     throw new Exception("you are blocked");
                 }
 
+
                 if (user == null || BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash) == false)
                 {
                     throw new Exception("username or password is wrong");

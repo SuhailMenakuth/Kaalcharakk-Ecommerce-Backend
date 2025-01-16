@@ -157,7 +157,7 @@ namespace Kaalcharakk.Services.ProductService
         }
 
 
-        public async Task<ApiResponse<string>> DeleteProductByIdServiceAsync(int id)
+        public async Task<ApiResponse<string>> ActivaeOrDeactivateProductByIdServiceAsync(int id, bool activate)
         {
            var product = await _productRepository.GetProductByIdAsync(id);
             if(product == null)
@@ -166,7 +166,7 @@ namespace Kaalcharakk.Services.ProductService
 
             }
 
-            product.IsActive = false;
+            product.IsActive = activate;
 
             var updatedProduct = await _productRepository.UpdateProductAsync(product);
 

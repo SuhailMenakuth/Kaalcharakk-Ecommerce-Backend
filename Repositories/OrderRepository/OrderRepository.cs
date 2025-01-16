@@ -22,19 +22,49 @@ namespace Kaalcharakk.Repositories.OrderRepository
                 .FirstOrDefaultAsync(x => x.UserId == userId);
 
             if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
+            {
+
+            }
                 throw new Exception("Cart is empty or not found");
 
-            
-            foreach (var item in userCart.Items)
-            {
-                var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-                if (product == null || product.Stock < item.Quantity)
-                    throw new Exception($"Insufficient stock for product: {item.Product.Name}");
 
+            //foreach (var item in userCart.Items)
+            //{
+            //    var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
+            //    if (product == null || product.Stock < item.Quantity || product.IsActive == false)
+            //        throw new Exception($"Insufficient stock for product: {item.Product.Name} ");
+
+            //    product.Stock -= item.Quantity;
+            //}
+            var errorMessages = new List<string>();
+
+            foreach (var item in userCart.Items)
+    {
+                var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
+                if (product == null)
+                {
+                    errorMessages.Add($"Product with ID {item.ProductId} does not exist.");
+                    continue;
+                }
+
+                if (!product.IsActive)
+                {
+                    errorMessages.Add($"Product '{product.Name}' is not active.");
+                }
+
+                if (product.Stock < item.Quantity)
+                {
+                    errorMessages.Add($"Insufficient stock for product '{product.Name}'. Available stock: {product.Stock}, required: {item.Quantity}.");
+                }
                 product.Stock -= item.Quantity;
             }
 
-           
+            // If there are errors, return them as part of the response
+            if (errorMessages.Any())
+            {
+                throw new Exception(string.Join(" | ", errorMessages));
+            }
+
             var newOrder = new Order
             {
                 UserId = userId,

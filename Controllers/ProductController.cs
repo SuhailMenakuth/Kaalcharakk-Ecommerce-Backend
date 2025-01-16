@@ -103,13 +103,38 @@ namespace Kaalcharakk.Controllers
         }
 
 
-        [HttpDelete("delete-product")]
+        [HttpPatch("activate-product")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> SoftDeleteProductBy(int id)
+        public async Task<IActionResult> ActivateProductById(int id)
         {
             try
             {
-                var response = await _productService.DeleteProductByIdServiceAsync(id);
+                var response = await _productService.ActivaeOrDeactivateProductByIdServiceAsync(id, activate: true);
+                if (response.StatusCode == 200)
+                {
+                    return Ok(response);
+
+                }
+                if (response.StatusCode == 404)
+                {
+                    return BadRequest(response);
+                }
+
+                return StatusCode(500, response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+        }
+
+        [HttpPatch("deactivate-product")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeactivateProductById(int id )
+        {
+            try
+            {
+                var response = await _productService.ActivaeOrDeactivateProductByIdServiceAsync(id, activate : false);
                 if (response.StatusCode == 200)
                 {
                     return Ok(response);
@@ -127,6 +152,10 @@ namespace Kaalcharakk.Controllers
                 return StatusCode(500, new { ex.Message });
             }
         }
+
+
+
+
 
         [HttpPut("{productId}")]
         [Authorize(Roles = "Admin")]
