@@ -1,70 +1,70 @@
-﻿using Razorpay.Api;
-using Microsoft.Extensions.Configuration;
+﻿using Kaalcharakk.Dtos.OrderDtos;
+using Razorpay.Api;
 
 namespace Kaalcharakk.Helpers.RazorPayHelper
 {
-    public class RazorpayHelper
+    public class RazorpayHelper : IRazorpayHelper
     {
-        private readonly string _razorpayKeyId;
-        private readonly string _razorpayKeySecret;
-
+        private readonly IConfiguration _configuration;
         public RazorpayHelper(IConfiguration configuration)
         {
-            _razorpayKeyId = configuration["Razorpay:KeyId"];
-            _razorpayKeySecret = configuration["Razorpay:KeySecret"];
+            _configuration = configuration;
         }
 
-        // Method to create a Razorpay order
-        public async Task<Order> CreateOrderAsync(decimal amount, string currency = "INR")
+        public async Task<string> CreateRazorpayOrder(long price)
         {
-            var client = new RazorpayClient(_razorpayKeyId, _razorpayKeySecret);
-            var orderOptions = new Dictionary<string, object>
-            {
-                { "amount", amount * 100 }, // Amount is in paise (cents)
-                { "currency", currency },
-                { "receipt", Guid.NewGuid().ToString() }
-            };
 
-            var order = client.Order.Create(orderOptions);
-            return order;
+            Dictionary<string, object> razorInp = new Dictionary<string, object>();
+
+            string transactionId = Guid.NewGuid().ToString();
+
+            razorInp.Add("amount", Convert.ToDecimal(price) * 100);
+            razorInp.Add("currency", "INR");
+            razorInp.Add("receipt", transactionId);
+
+            string key = _configuration["Razorpay:KeyId"];
+            string secret = _configuration["Razorpay:KeySecret"];
+
+            RazorpayClient client = new RazorpayClient(key, secret);
+
+            Razorpay.Api.Order order = client.Order.Create(razorInp);
+            var orderId = order["id"].ToString();
+            return orderId;
         }
 
-        // Method to verify Razorpay payment signature
-        public bool VerifyPaymentSignature(string orderId, string paymentId, string signature)
+        public async Task<bool> VerifyRazorpayPayment(RazorpayPaymentDto payment)
         {
-            var data = orderId + "|" + paymentId;
-            // Use Razorpay's method directly for signature verification
-            var paymentVerificationDetails = new Dictionary<string, string>
-            {
-                { "razorpay_payment_id", paymentId },
-                { "razorpay_orderId", orderId },
-                { "razorpay_signature", signature }
-            };
 
             try
             {
-                // Verify payment signature using Razorpay SDK's built-in method
+                if (payment == null || string.IsNullOrEmpty(payment.razorpay_payment_id)
+                    || string.IsNullOrEmpty(payment.razorpay_orderId) || string.IsNullOrEmpty(payment.razorpay_signature))
+                {
+                    return false;
+                }
+
+                RazorpayClient client = new RazorpayClient(_configuration["Razorpay:KeyId"], _configuration["Razorpay:KeySecret"]);
+
+                Dictionary<string, string> paymentVerificationDetails = new Dictionary<string, string>
+                {
+                    {"razorpay_payment_id", payment.razorpay_payment_id},
+                    {"razorpay_orderId" ,payment.razorpay_orderId },
+                    {"razorpay_signature",payment.razorpay_signature }
+
+
+                };
                 Utils.verifyPaymentSignature(paymentVerificationDetails);
                 return true;
             }
+
             catch (Exception ex)
             {
-                // Handle signature verification failure
-                throw new Exception("Payment signature verification failed: " + ex.Message);
+
+                throw new Exception(ex.Message);
             }
-        }
 
-        // Method to capture payment after successful payment
-        public async Task CapturePaymentAsync(string paymentId, decimal amount)
-        {
-            var client = new RazorpayClient(_razorpayKeyId, _razorpayKeySecret);
-            var payment = client.Payment.Fetch(paymentId); // No need to await here
-            var captureOptions = new Dictionary<string, object>
-            {
-                { "amount", amount * 100 } // Amount in paise
-            };
 
-            payment.Capture(captureOptions); // No await here either
+
         }
     }
 }

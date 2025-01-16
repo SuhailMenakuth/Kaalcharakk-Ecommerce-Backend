@@ -1,5 +1,6 @@
 ﻿using CloudinaryDotNet;
 using Kaalcharakk.Dtos.ProductDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 using Kaalcharakk.Services.ProductService;
 using Microsoft.AspNetCore.Authorization;
@@ -98,6 +99,64 @@ namespace Kaalcharakk.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+
+        [HttpDelete("delete-product")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SoftDeleteProductBy(int id)
+        {
+            try
+            {
+                var response = await _productService.DeleteProductByIdServiceAsync(id);
+                if (response.StatusCode == 200)
+                {
+                    return Ok(response);
+
+                }
+                if (response.StatusCode == 404)
+                {
+                    return BadRequest(response);
+                }
+
+                return StatusCode(500, response);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+        }
+
+        [HttpPut("{productId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateProductAsync(int productId,[FromForm] UpdateProductDto updateProductDto,IFormFile? newImage = null)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new ApiResponse<string>(400, "Invalid request data"));
+                }
+
+                var result = await _productService.UpdateProductServiceAsync(productId, updateProductDto, newImage);
+
+                if (result.StatusCode == 200)
+                {
+                    return Ok(result);
+                }
+                else if (result.StatusCode == 404)
+                {
+                    return NotFound(result);
+                }
+                else
+                {
+                    return StatusCode(500, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>(500, "An error occurred", error: ex.Message));
             }
         }
 

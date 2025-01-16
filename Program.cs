@@ -9,11 +9,14 @@ using Kaalcharakk.Repositories.AuthRepository;
 using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.OrderRepository;
 using Kaalcharakk.Repositories.ProductRepository;
+using Kaalcharakk.Repositories.UserRepository;
 using Kaalcharakk.Repositories.WishlistRepository;
 using Kaalcharakk.Services.AddressService;
 using Kaalcharakk.Services.Authentication;
 using Kaalcharakk.Services.CartService;
+using Kaalcharakk.Services.OrderService;
 using Kaalcharakk.Services.ProductService;
+using Kaalcharakk.Services.UserService;
 using Kaalcharakk.Services.WishlistServices;
 
 
@@ -54,10 +57,16 @@ namespace Kaalcharakk
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
             builder.Services.AddScoped<IWishlistService, WishlistService>();
-            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IAddressRepository, AddressRepository>();
             builder.Services.AddScoped<IAddressService, AddressService>();
-        
+
+
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IRazorpayHelper, RazorpayHelper>();
+            builder.Services.AddScoped<IUserRepositoy ,UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
 
             builder.Services.AddLogging();
             builder.Services.AddControllers();

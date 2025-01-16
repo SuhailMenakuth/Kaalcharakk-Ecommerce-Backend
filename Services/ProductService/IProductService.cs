@@ -14,6 +14,9 @@ namespace Kaalcharakk.Services.ProductService
 
         Task<List<ProductViewDto>> GetProductsByFilterServiceAsync(ProductFilterDto filterDto);
 
+        Task <ApiResponse<string>> DeleteProductByIdServiceAsync(int id);
+        Task<ApiResponse<string>> UpdateProductServiceAsync(int productId, UpdateProductDto updateProductDto, IFormFile newImage = null);
+
 
 
     }

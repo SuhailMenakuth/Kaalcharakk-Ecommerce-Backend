@@ -3,6 +3,7 @@ using Kaalcharakk.Dtos.AdressDtos;
 using Kaalcharakk.Dtos.AuthenticationDtos;
 using Kaalcharakk.Dtos.OrderDtos;
 using Kaalcharakk.Dtos.ProductDtos;
+using Kaalcharakk.Dtos.UserDtos;
 using Kaalcharakk.Models;
 
 namespace Kaalcharakk.Mapper
@@ -16,6 +17,8 @@ namespace Kaalcharakk.Mapper
             CreateMap<ProductViewDto,Product>().ReverseMap();
             CreateMap<OrderAddressDto , ShippingAddress>().ReverseMap();
             CreateMap<ViewAddressDto , ShippingAddress>().ReverseMap();
+            CreateMap<OrderViewDto , Order>().ReverseMap();
+            CreateMap<UserViewDto, User>().ReverseMap();
 
            
         }   

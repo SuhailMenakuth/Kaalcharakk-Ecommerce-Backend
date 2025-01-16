@@ -82,6 +82,14 @@ namespace Kaalcharakk.Repositories.ProductRepository
             return await query.ToListAsync();
         }
 
+        public async Task<bool> UpdateProductAsync(Product product)
+        {
+            _context.Products.Update(product);
+           return await _context.SaveChangesAsync() > 0 ;
+           
+
+        }
+
     }
    
 }

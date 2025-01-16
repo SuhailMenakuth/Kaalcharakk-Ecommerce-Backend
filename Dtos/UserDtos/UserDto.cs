@@ -1,10 +1,12 @@
 ﻿using Kaalcharakk.Models;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using Kaalcharakk.Dtos.OrderDtos;
+using Kaalcharakk.Dtos.AdressDtos;
 
 namespace Kaalcharakk.Dtos.UserDtos
 {
-    public class UserDto
+    public class UserViewDto
     {
         public int UserId { get; set; }
 
@@ -19,21 +21,18 @@ namespace Kaalcharakk.Dtos.UserDtos
 
         
         public string Phone { get; set; }
-
-        
-        public string PasswordHash { get; set; }
-
        
         public int RoleId { get; set; }
         public bool IsActived { get; set; } = true;
         public DateTime CreatedAt { get; set; } 
         public DateTime? UpdatedAt { get; set; } 
 
-
+        
         public Role Role { get; set; }
-        public Cart Cart { get; set; }
 
-        public ICollection<CartItem> cartItems { get; set; }
+        public List<ViewAddressDto>? ViewUserAddress { get; set; }
+
+        public List<OrderViewDto>? orders { get; set; } 
 
     }
 }

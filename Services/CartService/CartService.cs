@@ -1,4 +1,5 @@
 ﻿using Kaalcharakk.Dtos.CartDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.ProductRepository;
@@ -37,13 +38,15 @@ namespace Kaalcharakk.Services.CartService
             return response;
         }
 
-        public async Task AddOrUpdateItemAsync(int userId, CartItemRequestDto requestDto)
+        public async Task<ApiResponse<string>> AddOrUpdateItemAsync(int userId, CartItemRequestDto requestDto)
         {
             var product = await _productRepository.GetProductByIdAsync(requestDto.ProductId);
             if (product == null || product.Stock < 1
                 //requestDto.Quantity
                 )
-                throw new Exception("Product not available or insufficient stock.");
+                return new ApiResponse<string>(409, "insuficient stock or Product not available");
+
+                //throw new Exception("Product not available or insufficient stock.");
 
             var cart = await _cartRepository.GetCartByUserIdAsync(userId) ?? await _cartRepository.CreateCartAsync(userId);
 
@@ -55,7 +58,10 @@ namespace Kaalcharakk.Services.CartService
                     ;
 
                 if (cartItem.Quantity > product.Stock)
-                    throw new Exception("Insufficient stock.");
+
+                    return new ApiResponse<string>(409, "insuficient stock");
+
+                //throw new Exception("Insufficient stock.");
             }
             else
             {
@@ -68,6 +74,8 @@ namespace Kaalcharakk.Services.CartService
             }
 
             await _cartRepository.UpdateCartAsync(cart);
+            return new ApiResponse<string>(200, "product added sucessfully");
+
         }
 
         public async Task RemoveItemAsync(int userId, int productId)
@@ -94,7 +102,7 @@ namespace Kaalcharakk.Services.CartService
             var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
             if (cartItem == null) throw new Exception("Item not found in cart.");
 
-            // If increasing, just add 1 to the quantity
+            
             if (increase)
             {
                 cartItem.Quantity += 1;
@@ -102,7 +110,7 @@ namespace Kaalcharakk.Services.CartService
                 if (cartItem.Quantity > product.Stock)
                     throw new Exception("Insufficient stock.");
             }
-            // If decreasing, reduce the quantity by 1 (ensure it doesn't go below 1)
+            
             else
             {
                 if (cartItem.Quantity > 1)

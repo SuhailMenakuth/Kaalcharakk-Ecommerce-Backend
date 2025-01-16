@@ -6,8 +6,8 @@
         public int CartId { get; set; }
         public int UserId { get; set; }
 
-        public User User { get; set; }
-        public ICollection<CartItem> Items { get; set; }
+        public virtual User User { get; set; }
+        public virtual ICollection<CartItem> Items { get; set; }
 
 
     }

@@ -104,7 +104,7 @@ namespace Kaalcharakk.Configuration
                 .HasOne(ci => ci.Cart)
                 .WithMany(c => c.Items)
                 .HasForeignKey(ci => ci.CartId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // cartItem and Product 
             modelBuilder.Entity<CartItem>()

@@ -17,5 +17,7 @@ namespace Kaalcharakk.Repositories.ProductRepository
         Task<List<Product>> GetAllProductsAsync();
 
         Task<List<Product>> GetProductsByFilterAsync(ProductFilterDto filterDto);
+
+        Task<bool> UpdateProductAsync(Product product);
     }
 }

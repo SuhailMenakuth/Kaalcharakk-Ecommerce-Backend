@@ -1,4 +1,5 @@
 ﻿using Kaalcharakk.Dtos.CartDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Services.CartService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,22 +18,45 @@ namespace Kaalcharakk.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet]
+        [HttpGet("my-cart")]
         [Authorize]
         public async Task<IActionResult> GetCart()
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
-            var cart = await _cartService.GetCartAsync(userId);
-            return Ok(cart);
+
+            try
+            {
+                var cart = await _cartService.GetCartAsync(userId);
+                if (cart == null)
+                {
+                    //return StatusCode(204,new ApiResponse<object>(204, "no content"));
+                    return NotFound();
+                }
+
+                return Ok(new ApiResponse<CartResponseDto>(200, "Cart retrieved successfully", cart));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>(500, "An error occurred while retrieving the cart", error: ex.Message));
+            }
         }
 
-        [HttpPost]
+
+        [HttpPost("addorupdate")]
         [Authorize]
         public async Task<IActionResult> AddOrUpdateItem([FromBody] CartItemRequestDto request)
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
-            await _cartService.AddOrUpdateItemAsync(userId, request);
-            return NoContent();
+            var respose =await _cartService.AddOrUpdateItemAsync(userId, request);
+            if(respose.Message == "insuficient stock or Product not available")
+            {
+                return StatusCode(409,new ApiResponse<string>(409, "insuficient stock or Product not available"));
+            }
+            if (respose.Message == "insuficient stock")
+            {
+                return StatusCode(409, new ApiResponse<string>(409, "insuficient stock "));
+            }
+            return Ok("Cart Updated");
         }
 
         [HttpDelete("{productId}")]
@@ -50,7 +74,7 @@ namespace Kaalcharakk.Controllers
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             await _cartService.UpdateItemQuantityAsync(userId, productId, increase: true);
-            return Ok();
+            return Ok("Quantity Updated");
         }
 
         
@@ -60,7 +84,7 @@ namespace Kaalcharakk.Controllers
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             await _cartService.UpdateItemQuantityAsync(userId, productId, increase: false);
-            return Ok();
+            return Ok("Quantity Updated");
         }
 
         [HttpDelete("clear")]
