@@ -157,7 +157,7 @@ namespace Kaalcharakk.Controllers
 
 
 
-        [HttpPut("{productId}")]
+        [HttpPatch("{productId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateProductAsync(int productId,[FromForm] UpdateProductDto updateProductDto,IFormFile? newImage = null)
         {

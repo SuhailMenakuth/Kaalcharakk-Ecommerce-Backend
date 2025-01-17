@@ -8,5 +8,9 @@ namespace Kaalcharakk.Services.OrderService
     {
         Task<ApiResponse<string>> CreateOrderAsync(int userId, CreateOrderDto createOrderDto);
         Task<List<OrderViewDto>> GetOrdersAsync(int userId);
+
+        Task<ApiResponse<OrderViewDto>> GetOrderByOrderById(int orderId);
+
+        Task<ApiResponse<string>> UpdateOrderStatus(int orderId, OrderStatus status);
     }
 }

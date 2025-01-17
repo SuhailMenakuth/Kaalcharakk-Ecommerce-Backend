@@ -185,28 +185,27 @@ namespace Kaalcharakk.Services.ProductService
         {
             try
             {
-                // Fetch the existing product
+                
                 var existingProduct = await _productRepository.GetProductByIdAsync(productId);
                 if (existingProduct == null)
                 {
                     return new ApiResponse<string>(404, "Product not found");
                 }
 
-                // Handle image update if a new image is provided
+               
                 if (newImage != null)
                 {
-                    // Extract the public ID from the existing image URL
+                    
                     var existingImagePublicId = _cloudinaryHelper.ExtractPublicIdFromUrl(existingProduct.ImageUrl);
 
-                    // Delete the existing image from Cloudinary
+                   
                     await _cloudinaryHelper.DeleteImageAsync(existingImagePublicId);
 
-                    // Upload the new image to Cloudinary
                     var newImageUrl = await _cloudinaryHelper.UploadProductImageAsyn(newImage);
                     existingProduct.ImageUrl = newImageUrl;
                 }
 
-                // Update other product properties
+                
                 existingProduct.Name = updateProductDto.Name;
                 existingProduct.Price = updateProductDto.Price;
                 existingProduct.CategoryId = updateProductDto.CategoryId;
@@ -217,7 +216,7 @@ namespace Kaalcharakk.Services.ProductService
                 existingProduct.OfferEndingDate = updateProductDto.OfferEndingDate ?? DateTime.UtcNow;
                 existingProduct.IsActive = updateProductDto.IsActive;
 
-                // Save the updated product to the database
+                
                 var updateResult = await _productRepository.UpdateProductAsync(existingProduct);
                 if (updateResult)
                 {

@@ -1,5 +1,7 @@
 ﻿using Kaalcharakk.Dtos.OrderDtos;
+using Kaalcharakk.Models;
 using Kaalcharakk.Services.OrderService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -36,14 +38,14 @@ namespace Kaalcharakk.Controllers
                 return StatusCode(500, new { message = "An error occurred while placing the order.", error = ex.Message });
             }
         }
-        
+
         [HttpGet("my-orders")]
         public async Task<IActionResult> GetOrders()
         {
             try
             {
-                
-                
+
+
                 var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
 
                 var orders = await _orderService.GetOrdersAsync(userId);
@@ -55,5 +57,71 @@ namespace Kaalcharakk.Controllers
                 return StatusCode(500, new { message = "An error occurred while fetching the orders.", error = ex.Message });
             }
         }
+
+
+        //[HttpPatch("update-orderstatus")]
+        //[Authorize(Roles = "Admin")]
+        //public async Task<IActionResult> UpdateOrderStatus(int orderId , OrderStatus orderstatus)
+        //{
+
+        //}
+
+        [HttpGet("retrive-order{orderId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetOrderById(int orderId)
+        {
+
+            try
+            {
+
+                var res = await _orderService.GetOrderByOrderById(orderId);
+               
+                
+                if (res.StatusCode == 404)
+                {
+                    return BadRequest(res);
+                }
+                    return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+
+            }
+
+        }
+
+        [HttpPatch("update-orders-status")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateOrderStatus(int orderId , OrderStatus orderStatus)
+        {
+
+            try
+            {
+
+                var res = await _orderService.UpdateOrderStatus(orderId, orderStatus);
+
+
+                if (res.StatusCode == 400)
+                {
+                    return BadRequest(res);
+                }
+                if (res.StatusCode == 404)
+                {
+                    return BadRequest(res);
+                }
+                if (res.StatusCode == 500)
+                {
+                    return StatusCode(500, res);
+                }
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+
+        }
+
     }
 }

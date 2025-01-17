@@ -24,8 +24,8 @@ namespace Kaalcharakk.Repositories.OrderRepository
             if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
             {
 
-            }
                 throw new Exception("Cart is empty or not found");
+            }
 
 
             //foreach (var item in userCart.Items)
@@ -156,6 +156,25 @@ namespace Kaalcharakk.Repositories.OrderRepository
         //    }
         //    return false;
         //}
+
+
+        public async Task<Order> GetOrderByOrderId(int orderId)
+        {
+            return await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .Include(o => o.ShippingAddress)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
+        public async Task<bool> UpdateOrderAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            return await _context.SaveChangesAsync() > 0;
+
+
+        }
     }
 
 }

@@ -15,5 +15,11 @@ namespace Kaalcharakk.Repositories.OrderRepository
         Task<bool> DecrementStockAsync(int productId, int quantity);
         Task<bool> ValidateCartStockAsync(int userId);
         Task<List<Order>> GetOrdersByUserAsync(int userId);
+
+        Task<Order> GetOrderByOrderId(int orderId);
+        Task<bool> UpdateOrderAsync(Order order);
+
+
+
     }
 }
