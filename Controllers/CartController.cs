@@ -79,16 +79,37 @@ namespace Kaalcharakk.Controllers
                 return NotFound(response);
             }
 
-            return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
+            return Ok(response);
         }
 
         [HttpPost("increase/{productId}")]
         [Authorize(Roles ="User")]
         public async Task<IActionResult> IncreaseQuantity( int productId)
         {
+            try
+            {
+
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
-            await _cartService.UpdateItemQuantityAsync(userId, productId, increase: true);
-            return Ok("Quantity Updated");
+            var response = await _cartService.UpdateItemQuantityAsync(userId, productId, increase: true);
+            if(response.StatusCode == 422)
+            {
+                StatusCode(422, response);
+
+            }
+            if(response.StatusCode == 404)
+            {
+                return NotFound(response);
+            }
+            if(response.StatusCode == 400)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($" internal server error : {ex.Message} ");
+            }
         }
 
         

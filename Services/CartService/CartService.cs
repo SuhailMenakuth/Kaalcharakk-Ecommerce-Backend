@@ -67,7 +67,7 @@ namespace Kaalcharakk.Services.CartService
 
                 if (cartItem.Quantity > product.Stock)
 
-                    return new ApiResponse<string>(422, "insuficient stock");
+                    return new ApiResponse<string>(422, "unprocessable Entity", error: "insufficient stock");
 
                 //throw new Exception("Insufficient stock.");
             }
@@ -92,7 +92,7 @@ namespace Kaalcharakk.Services.CartService
             if (cart == null)
             {
 
-                return new ApiResponse<string>(404, "cart canot found ");
+                return new ApiResponse<string>(404, "not found", error:"cart canot found ");
 
                 //throw new Exception("Cart not found.");
             }
@@ -100,26 +100,40 @@ namespace Kaalcharakk.Services.CartService
             var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
             if (cartItem == null)
             {
-                return new ApiResponse<string>(404, "product canot found in your cart ");
+                return new ApiResponse<string>(404, "not found", error:"product canot found in your cart ");
                 //throw new Exception(".Item not found in cart");
             }
 
             cart.Items.Remove(cartItem);
             await _cartRepository.UpdateCartAsync(cart);
-            return new ApiResponse<string>(200, "item removed from the cart successfully");
+            return new ApiResponse<string>(200, "success",$"item removed from the cart successfully {productId}");
         }
 
-        public async Task UpdateItemQuantityAsync(int userId, int productId, bool increase)
+        public async Task<ApiResponse<string>> UpdateItemQuantityAsync(int userId, int productId, bool increase)
         {
+            try
+            {
+
             var product = await _productRepository.GetProductByIdAsync(productId);
-            if (product == null || product.Stock < 1)
-                throw new Exception("Product not available or insufficient stock.");
+            if ( product.Stock < 1)
+                return new ApiResponse<string>(422, "unprocessable Entity", error: "insufficient stock");
+
+            if (product == null)
+            {
+                return new ApiResponse<string>(404, "not found", error: "product not found");
+            }
 
             var cart = await _cartRepository.GetCartByUserIdAsync(userId);
-            if (cart == null) throw new Exception("Cart not found.");
+            if (cart == null)
+            {
+                return new ApiResponse<string>(404,"not found" ,error:"cart not found for this user");
+            }
 
             var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
-            if (cartItem == null) throw new Exception("Item not found in cart.");
+            if (cartItem == null)
+            {
+                return new ApiResponse<string>(404,"not found",error:"Item not found in cart.");
+            }
 
             
             if (increase)
@@ -127,7 +141,7 @@ namespace Kaalcharakk.Services.CartService
                 cartItem.Quantity += 1;
 
                 if (cartItem.Quantity > product.Stock)
-                    throw new Exception("Insufficient stock.");
+                    return new ApiResponse<string>(422, "unprocessable Entity", error: "insufficient stock");
             }
             
             else
@@ -138,11 +152,17 @@ namespace Kaalcharakk.Services.CartService
                 }
                 else
                 {
-                    throw new Exception("Quantity cannot be less than 1.");
+                    return new ApiResponse<string>(400, "Badrequest", error: "Quantity cannot be less than zero");
                 }
             }
 
             await _cartRepository.UpdateCartAsync(cart);
+            return new ApiResponse<string>(200, "success", $"Quantity Updated Successfully {productId}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal server error{ ex.InnerException }");
+            }
         }
 
         public async Task RemoveAllItemsAsync(int userId)
