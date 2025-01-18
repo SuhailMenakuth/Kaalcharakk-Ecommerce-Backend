@@ -5,6 +5,7 @@ using Kaalcharakk.Helpers.RazorPayHelper;
 using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 using Kaalcharakk.Repositories.OrderRepository;
+using Kaalcharakk.Services.AddressService;
 
 namespace Kaalcharakk.Services.OrderService
 {
@@ -13,19 +14,37 @@ namespace Kaalcharakk.Services.OrderService
         private readonly IOrderRepository _orderRepository;
         private readonly IRazorpayHelper _razorpayHelper;
         private readonly IMapper _mapper;
+        private readonly IAddressService _addressService; 
 
 
-        public OrderService(IOrderRepository orderRepository, IRazorpayHelper razorpayHelper,IMapper mapper)
+        public OrderService(IOrderRepository orderRepository, IRazorpayHelper razorpayHelper,IMapper mapper , IAddressService addressService)
         {
             _orderRepository = orderRepository;
             _razorpayHelper = razorpayHelper;
             _mapper = mapper;
+            _addressService = addressService;
+            
         }
 
-        public async Task<ApiResponse<string>> CreateOrderAsync(int userId, CreateOrderDto createOrderDto)
+        public async Task<ApiResponse<string>> CreateOrderAsync(int userId, CreateOrderDto createOrderDto )
         {
-         
-            if (!await _orderRepository.ValidateCartStockAsync(userId))
+            try
+            {
+
+
+
+                if (createOrderDto == null)
+                {
+                    return new ApiResponse<string>(400, "CreateOrderDto cannot be null");
+                }
+
+                var userAdress = await _addressService.GetShippingAddressesAsync(userId);
+                if (!userAdress.Data.Any())
+                {
+                    return new ApiResponse<string>(404, "Address canot be empty", error: "you dont have any adress");
+                }
+
+                if (!await _orderRepository.ValidateCartStockAsync(userId))
                 return new ApiResponse<string>(400,"Insufficient stock");
 
            
@@ -36,6 +55,11 @@ namespace Kaalcharakk.Services.OrderService
             var order = await _orderRepository.CreateOrderAsync(userId, createOrderDto);
 
             return new ApiResponse<string>(200,"Order created successfully", razorpayOrderId);
+            }
+            catch( Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<List<OrderViewDto>> GetOrdersAsync(int userId)

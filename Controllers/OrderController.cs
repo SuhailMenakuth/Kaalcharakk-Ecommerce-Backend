@@ -29,13 +29,13 @@ namespace Kaalcharakk.Controllers
                 var response = await _orderService.CreateOrderAsync(userId, orderDto);
 
                 if (response.Message == "Insufficient stock")
-                    return BadRequest(new { message = response.Message });
+                    return BadRequest(response);
 
-                return Ok(new { message = response.Message });
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while placing the order.", error = ex.Message });
+                return StatusCode(500, new { message = "An error occurred while placing the order.", error = ex.InnerException });
             }
         }
 

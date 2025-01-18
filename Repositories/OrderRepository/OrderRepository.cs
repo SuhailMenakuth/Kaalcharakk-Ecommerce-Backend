@@ -16,6 +16,9 @@ namespace Kaalcharakk.Repositories.OrderRepository
 
         public async Task<Order> CreateOrderAsync(int userId, CreateOrderDto createOrderDto)
         {
+            try
+            {
+                
             var userCart = await _context.Carts
                 .Include(x => x.Items)
                 .ThenInclude(x => x.Product)
@@ -86,6 +89,11 @@ namespace Kaalcharakk.Repositories.OrderRepository
 
             await _context.SaveChangesAsync();
             return newOrder;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<bool> DecrementStockAsync(int productId, int quantity)

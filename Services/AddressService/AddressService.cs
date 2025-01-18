@@ -31,6 +31,7 @@ namespace Kaalcharakk.Services.AddressService
                 }
 
 
+
                 // A user can have atmost 3 address
 
                 var addressCount = await _addressRepository.GetShippingAdressCount(userId);
@@ -58,6 +59,8 @@ namespace Kaalcharakk.Services.AddressService
         public async Task<ApiResponse<List<ViewAddressDto>>> GetShippingAddressesAsync(int userId)
         {
             
+
+
             var userAddress = await _addressRepository.GetUserWithShippingAddressesAsync(userId);
 
             if (userAddress == null)

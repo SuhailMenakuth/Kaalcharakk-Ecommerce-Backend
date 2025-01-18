@@ -30,7 +30,7 @@ namespace Kaalcharakk.Controllers
                 if (cart == null)
                 {
                     //return StatusCode(204,new ApiResponse<object>(204, "no content"));
-                    return NotFound();
+                    return StatusCode(202, new ApiResponse<CartResponseDto>(202,"request is succes full but cart not foundd ",  error :"add product to cart first "));
                 }
 
                 return Ok(new ApiResponse<CartResponseDto>(200, "Cart retrieved successfully", cart));
@@ -48,15 +48,19 @@ namespace Kaalcharakk.Controllers
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
             var respose =await _cartService.AddOrUpdateItemAsync(userId, request);
-            if(respose.Message == "insuficient stock or Product not available")
+            if(respose.StatusCode == 404)
             {
-                return StatusCode(409,new ApiResponse<string>(409, "insuficient stock or Product not available"));
+                return StatusCode(404,new ApiResponse<string>(404, " Product not available"));
             }
-            if (respose.Message == "insuficient stock")
+            if (respose.StatusCode == 403)
             {
-                return StatusCode(409, new ApiResponse<string>(409, "insuficient stock "));
+                return StatusCode(403, respose);
             }
-            return Ok("Cart Updated");
+            if (respose.StatusCode == 409)
+            {
+                return StatusCode(409, new ApiResponse<string>(422, "insuficient stock "));
+            }
+            return Ok(respose);
         }
 
         [HttpDelete("{productId}")]
@@ -64,8 +68,18 @@ namespace Kaalcharakk.Controllers
         public async Task<IActionResult> RemoveItem(int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
-            await _cartService.RemoveItemAsync(userId, productId);
-            return NoContent();
+           var response = await _cartService.RemoveItemAsync(userId, productId);
+
+            if(response.Message == "cart canot found ")
+            {
+                return NotFound(response);
+            }
+            if(response.Message == "product canot found in your cart")
+            {
+                return NotFound(response);
+            }
+
+            return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
         }
 
         [HttpPost("increase/{productId}")]
@@ -93,7 +107,8 @@ namespace Kaalcharakk.Controllers
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             await _cartService.RemoveAllItemsAsync(userId);
-            return Ok("All items have been removed from the cart.");
+
+            return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
         }
     }
 

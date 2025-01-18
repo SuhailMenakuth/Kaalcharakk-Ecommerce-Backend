@@ -41,10 +41,18 @@ namespace Kaalcharakk.Services.CartService
         public async Task<ApiResponse<string>> AddOrUpdateItemAsync(int userId, CartItemRequestDto requestDto)
         {
             var product = await _productRepository.GetProductByIdAsync(requestDto.ProductId);
-            if (product == null || product.Stock < 1
+            if (product == null 
                 //requestDto.Quantity
                 )
-                return new ApiResponse<string>(409, "insuficient stock or Product not available");
+                return new ApiResponse<string>(404, " Product not available");
+            if(!product.IsActive)
+                {
+                    return new ApiResponse<string>(403, "the product is inactive and cannot be added to the cart");
+                }
+                if(product.Stock < 1)
+                {
+                return new ApiResponse<string>(422, "insuficient stock ");
+            }
 
                 //throw new Exception("Product not available or insufficient stock.");
 
@@ -59,7 +67,7 @@ namespace Kaalcharakk.Services.CartService
 
                 if (cartItem.Quantity > product.Stock)
 
-                    return new ApiResponse<string>(409, "insuficient stock");
+                    return new ApiResponse<string>(422, "insuficient stock");
 
                 //throw new Exception("Insufficient stock.");
             }
@@ -78,16 +86,27 @@ namespace Kaalcharakk.Services.CartService
 
         }
 
-        public async Task RemoveItemAsync(int userId, int productId)
+        public async Task<ApiResponse<string>> RemoveItemAsync(int userId, int productId)
         {
             var cart = await _cartRepository.GetCartByUserIdAsync(userId);
-            if (cart == null) throw new Exception("Cart not found.");
+            if (cart == null)
+            {
+
+                return new ApiResponse<string>(404, "cart canot found ");
+
+                //throw new Exception("Cart not found.");
+            }
 
             var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
-            if (cartItem == null) throw new Exception("Item not found in cart.");
+            if (cartItem == null)
+            {
+                return new ApiResponse<string>(404, "product canot found in your cart ");
+                //throw new Exception(".Item not found in cart");
+            }
 
             cart.Items.Remove(cartItem);
             await _cartRepository.UpdateCartAsync(cart);
+            return new ApiResponse<string>(200, "item removed from the cart successfully");
         }
 
         public async Task UpdateItemQuantityAsync(int userId, int productId, bool increase)

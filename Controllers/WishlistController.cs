@@ -1,4 +1,5 @@
 ﻿using Kaalcharakk.Services.WishlistServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,6 +17,7 @@ namespace Kaalcharakk.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetWishlist()
         {
             
@@ -27,6 +29,7 @@ namespace Kaalcharakk.Controllers
         }
 
         [HttpPost("{productId}")]
+        [Authorize]
         public async Task<IActionResult> AddToWishlist(int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
@@ -57,6 +60,7 @@ namespace Kaalcharakk.Controllers
         }
 
         [HttpDelete("{productId}")]
+        [Authorize]
         public async Task<IActionResult> RemoveFromWishlist(int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
@@ -72,6 +76,7 @@ namespace Kaalcharakk.Controllers
         }
 
         [HttpDelete]
+        [Authorize]
         public async Task<IActionResult> ClearWishlist()
         {
             
