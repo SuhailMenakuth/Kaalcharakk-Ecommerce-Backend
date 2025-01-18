@@ -71,8 +71,8 @@ namespace Kaalcharakk.Controllers
             }
         }
 
-        [HttpGet("products")]
-        [Authorize]
+        [HttpGet("all-products-admin-view")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllProducts()
         {
             try
@@ -87,8 +87,29 @@ namespace Kaalcharakk.Controllers
             }
 
         }
+        
 
-        [HttpGet("filter")]
+        [HttpGet("all-active-products")]
+        [Authorize]
+        public async Task<IActionResult> GetAllActiveProducts()
+        {
+            try
+            {
+                var response = await _productService.GetAllProductsForUsersServiceAsync();
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { ex.Message });
+            }
+
+        }
+
+
+
+
+        [HttpGet("filter-products")]
         public async Task<IActionResult> GetFilteredProducts([FromQuery]ProductFilterDto filterCriteria)
         {
             try

@@ -17,6 +17,7 @@ namespace Kaalcharakk.Services.ProductService
         Task <ApiResponse<string>> ActivaeOrDeactivateProductByIdServiceAsync(int id , bool activate);
         Task<ApiResponse<string>> UpdateProductServiceAsync(int productId, UpdateProductDto updateProductDto, IFormFile newImage = null);
 
+        Task<ApiResponse<List<ProductViewDto>>> GetAllProductsForUsersServiceAsync();
 
 
     }

@@ -103,6 +103,7 @@ namespace Kaalcharakk.Services.ProductService
             try
             {
                 //List<ProductViewDto> products = new List<ProductViewDto>();
+
                  var products  = await _productRepository.GetAllProductsAsync();
 
                 var AllProductList = products.Select(p =>
@@ -134,6 +135,39 @@ namespace Kaalcharakk.Services.ProductService
                 throw;
             }
 
+        }
+
+        public async Task<ApiResponse<List<ProductViewDto>>> GetAllProductsForUsersServiceAsync()
+        {
+            try
+            {
+                var products = await _productRepository.GetAllProductsUsers();
+                var AllProductList =  products.Select(p =>
+
+                new ProductViewDto
+                {
+
+                    ProductId = p.ProductId,
+                    Category = p.Category.Name,
+                    Name = p.Name,
+                    Price = p.Price,
+                    ImageUrl = p.ImageUrl,
+                    Color = p.Color,
+                    Stock = p.Stock,
+                    Offer = p.Offer,
+                    OfferStartingDate = p.OfferStartingDate,
+                    OfferEndingDate = p.OfferEndingDate,
+                    IsActive = p.IsActive
+
+
+                }).ToList();
+
+                return  new ApiResponse<List<ProductViewDto>>(200,"success", AllProductList);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal server error , {ex.Message}");
+            }
         }
 
         public async Task<List<ProductViewDto>> GetProductsByFilterServiceAsync(ProductFilterDto filterDto)

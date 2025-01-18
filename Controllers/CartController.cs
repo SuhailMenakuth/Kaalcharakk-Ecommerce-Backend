@@ -42,7 +42,7 @@ namespace Kaalcharakk.Controllers
         }
 
 
-        [HttpPost("addorupdate")]
+        [HttpPost("addorupdate-cart")]
         [Authorize]
         public async Task<IActionResult> AddOrUpdateItem([FromBody] CartItemRequestDto request)
         {
@@ -63,7 +63,7 @@ namespace Kaalcharakk.Controllers
             return Ok(respose);
         }
 
-        [HttpDelete("{productId}")]
+        [HttpDelete("delete-product-{productId}")]
         [Authorize]
         public async Task<IActionResult> RemoveItem(int productId)
         {
@@ -82,7 +82,7 @@ namespace Kaalcharakk.Controllers
             return Ok(response);
         }
 
-        [HttpPost("increase/{productId}")]
+        [HttpPost("increase-quantity/{productId}")]
         [Authorize(Roles ="User")]
         public async Task<IActionResult> IncreaseQuantity( int productId)
         {
@@ -113,7 +113,7 @@ namespace Kaalcharakk.Controllers
         }
 
         
-        [HttpPost("decrease/{productId}")]
+        [HttpPost("decrease-quantity/{productId}")]
         [Authorize]
         public async Task<IActionResult> DecreaseQuantity( int productId)
         {

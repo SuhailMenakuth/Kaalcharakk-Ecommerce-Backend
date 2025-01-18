@@ -89,6 +89,13 @@ namespace Kaalcharakk.Repositories.ProductRepository
            
 
         }
+        public async Task<List<Product>> GetAllProductsUsers()
+        {
+            return await _context.Products
+                 .Include(p => p.Category)
+                 .Where(p => p.IsActive == true)
+                 .ToListAsync();
+        }
 
     }
    
