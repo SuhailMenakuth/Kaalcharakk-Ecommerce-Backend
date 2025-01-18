@@ -165,15 +165,24 @@ namespace Kaalcharakk.Services.CartService
             }
         }
 
-        public async Task RemoveAllItemsAsync(int userId)
+        public async Task<ApiResponse<string>> RemoveAllItemsAsync(int userId)
         {
             var cart = await _cartRepository.GetCartByUserIdAsync(userId);
-            if (cart == null) throw new Exception("Cart not found.");
+            
+            if (cart == null)
+            {
+                return new ApiResponse<string>(404, "not found", error: $"cart not found for this ${userId}user");
+            }
+            if (cart.Items.Count < 1)
+            {
+                return new ApiResponse<string>(400, "Badrequest", error: "you cart is empty");
+            }
 
-            // Remove all items from the cart
             cart.Items.Clear();
-
             await _cartRepository.UpdateCartAsync(cart);
+            return new ApiResponse<string>(200, "success", $"cart cleared success fully  Successfully");
+
+
         }
     }
 }

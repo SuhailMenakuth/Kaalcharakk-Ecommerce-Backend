@@ -117,17 +117,48 @@ namespace Kaalcharakk.Controllers
         [Authorize]
         public async Task<IActionResult> DecreaseQuantity( int productId)
         {
+
+            try
+            {
+
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
-            await _cartService.UpdateItemQuantityAsync(userId, productId, increase: false);
-            return Ok("Quantity Updated");
+           var response =  await _cartService.UpdateItemQuantityAsync(userId, productId, increase: false);
+            if (response.StatusCode == 422)
+            {
+                StatusCode(422, response);
+
+            }
+            if (response.StatusCode == 404)
+            {
+                return NotFound(response);
+            }
+            if (response.StatusCode == 400)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($" internal server error : {ex.Message} ");
+            }
         }
 
-        [HttpDelete("clear")]
+        [HttpDelete("clear-cart")]
         [Authorize]
         public async Task<IActionResult> ClearCart()
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
-            await _cartService.RemoveAllItemsAsync(userId);
+            var response = await _cartService.RemoveAllItemsAsync(userId);
+            if(response.StatusCode == 400)
+            {
+                return BadRequest(response);
+            }
+            if(response.StatusCode == 404)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
 
             return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
         }
