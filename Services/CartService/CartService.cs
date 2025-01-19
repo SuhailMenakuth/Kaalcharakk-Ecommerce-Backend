@@ -82,7 +82,7 @@ namespace Kaalcharakk.Services.CartService
             }
 
             await _cartRepository.UpdateCartAsync(cart);
-            return new ApiResponse<string>(200, "product added sucessfully");
+            return new ApiResponse<string>(200,"success", $"product added sucessfully {requestDto.ProductId}  ");
 
         }
 

@@ -136,5 +136,13 @@ namespace Kaalcharakk.Controllers
 
         }
 
+        [HttpPatch("get-all-orders")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllOrders()
+        {
+           var response = await _orderService.GetAllOrderServiceAsync();
+            return Ok(response);
+        }
+
     }
 }

@@ -50,6 +50,7 @@ namespace Kaalcharakk.Services.OrderService
 
                 var response = await _orderRepository.ValidateCartStockAsync(userId);
                 if (response.StatusCode == 400) return response;
+                if (response.StatusCode == 404) return response;
                
                 var razorpayOrderId = await _razorpayHelper.CreateRazorpayOrder((long)createOrderDto.Totalamount);
 
@@ -149,5 +150,39 @@ namespace Kaalcharakk.Services.OrderService
             return new ApiResponse<string>(200, "success","order Updated succesfully");
 
         }
+
+
+        public async Task<ApiResponse<List<OrderViewDto>>> GetAllOrderServiceAsync()
+        {
+            // Fetch all orders from the repository
+            var orders = await _orderRepository.GetAllOrdersAsync();
+
+            // Check if orders are null or empty
+            if (orders == null || !orders.Any())
+            {
+                return new ApiResponse<List<OrderViewDto>>(404, "No orders found.");
+            }
+
+            // Map orders to OrderViewDto
+            var orderViewDtos = orders.Select(order => new OrderViewDto
+            {
+                TransactionId = order.TransactionId,
+                TotalAmount = order.TotalAmount,
+                OrderStatus = order.OrderStatus.ToString(),
+                DeliveryAdrress = order.ShippingAddress?.Address ?? "No address provided",
+                Phone = order.ShippingAddress?.Phone ?? "No phone number provided",
+                OrderDate = order.OrderDate,
+                Items = order.OrderItems?.Select(oi => new OrderItemDto
+                {
+                    ProductName = oi.Product?.Name ?? "Unknown Product",
+                    Quantity = oi.Quantity,
+                    Price = oi.Price * oi.Quantity,
+                }).ToList() ?? new List<OrderItemDto>()
+            }).ToList();
+
+            // Return the API response
+            return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+        }
+
     }
 }

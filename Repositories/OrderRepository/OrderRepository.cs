@@ -177,6 +177,14 @@ namespace Kaalcharakk.Repositories.OrderRepository
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
+        public async Task<List<Order>> GetAllOrdersAsync()
+        {
+            return await _context.Orders
+                .Include (o => o.User)
+                .Include(o => o.OrderItems)
+                .ToListAsync();
+        }
+
         public async Task<bool> UpdateOrderAsync(Order order)
         {
             _context.Orders.Update(order);

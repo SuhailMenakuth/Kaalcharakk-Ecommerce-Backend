@@ -12,5 +12,9 @@ namespace Kaalcharakk.Services.OrderService
         Task<ApiResponse<OrderViewDto>> GetOrderByOrderById(int orderId);
 
         Task<ApiResponse<string>> UpdateOrderStatus(int orderId, OrderStatus status);
+
+        Task<ApiResponse<List<OrderViewDto>>> GetAllOrderServiceAsync();
     }
+
+
 }
