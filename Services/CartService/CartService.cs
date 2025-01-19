@@ -152,7 +152,7 @@ namespace Kaalcharakk.Services.CartService
                 }
                 else
                 {
-                    return new ApiResponse<string>(400, "Badrequest", error: "Quantity cannot be less than zero");
+                    return new ApiResponse<string>(400, "Badrequest", error: "Quantity cannot be less than 1");
                 }
             }
 

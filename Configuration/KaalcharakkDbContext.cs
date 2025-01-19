@@ -73,7 +73,12 @@ namespace Kaalcharakk.Configuration
                 .IsUnique();
             });
 
-
+            modelBuilder.Entity<Product>()
+                .ToTable(tableBuilder =>
+                {
+                    tableBuilder.HasCheckConstraint("Product_Stock_NonNegative", "[Stock] >= 0");
+                    tableBuilder.HasCheckConstraint("Product_Price_Nonnegative", "[Price] >= 0");
+                });
             // category and product 
             modelBuilder.Entity<Category>()
                 .HasMany(c => c.Products)

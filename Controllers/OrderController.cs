@@ -28,16 +28,29 @@ namespace Kaalcharakk.Controllers
 
                 var response = await _orderService.CreateOrderAsync(userId, orderDto);
 
-                if (response.Message == "Insufficient stock")
+                if (response.StatusCode == 400)
                     return BadRequest(response);
+                if (response.StatusCode == 404)
+                {
+                    return StatusCode(404, response);
+                }
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An error occurred while placing the order.", error = ex.InnerException });
+                return StatusCode(500, new { message = "An error occurred while placing the order.", error = ex.Message });
+                //var errorResponse = new
+                //{
+                //    message = "An error occurred while processing the order.",
+                //    error = ex.Message,  // Include the exception message
+                //    stackTrace = ex.StackTrace  // Optionally include the stack trace for debugging
+                //};
+               // return StatusCode(500, errorResponse);
             }
         }
+
+
 
         [HttpGet("my-orders")]
         public async Task<IActionResult> GetOrders()

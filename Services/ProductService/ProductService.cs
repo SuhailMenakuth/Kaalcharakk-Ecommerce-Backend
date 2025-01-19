@@ -256,24 +256,24 @@ namespace Kaalcharakk.Services.ProductService
                 }
 
                 
-                existingProduct.Name = updateProductDto.Name;
-                existingProduct.Price = updateProductDto.Price;
-                existingProduct.CategoryId = updateProductDto.CategoryId;
-                existingProduct.Color = updateProductDto.Color;
-                existingProduct.Stock = updateProductDto.Stock;
-                existingProduct.Offer = updateProductDto.Offer;
+                existingProduct.Name = updateProductDto.Name ?? existingProduct.Name;
+                existingProduct.Price = updateProductDto.Price ?? existingProduct.Price;
+                existingProduct.CategoryId = updateProductDto.CategoryId ?? existingProduct.CategoryId;
+                existingProduct.Color = updateProductDto.Color ?? existingProduct.Color; 
+                existingProduct.Stock = updateProductDto.Stock ?? existingProduct.Stock;
+                existingProduct.Offer = updateProductDto.Offer ?? existingProduct.Offer;
                 existingProduct.OfferStartingDate = updateProductDto.OfferStartingDate ?? DateTime.UtcNow;
                 existingProduct.OfferEndingDate = updateProductDto.OfferEndingDate ?? DateTime.UtcNow;
-                existingProduct.IsActive = updateProductDto.IsActive;
+                existingProduct.IsActive = updateProductDto.IsActive ?? existingProduct.IsActive;
 
                 
                 var updateResult = await _productRepository.UpdateProductAsync(existingProduct);
                 if (updateResult)
                 {
-                    return new ApiResponse<string>(200, "Product updated successfully");
+                    return new ApiResponse<string>(200,"success", $"Product updated successfully {productId}");
                 }
 
-                return new ApiResponse<string>(500, "Failed to update the product");
+                return new ApiResponse<string>(500,"internal server error", error:$"Failed to update the product");
             }
             catch (Exception ex)
             {

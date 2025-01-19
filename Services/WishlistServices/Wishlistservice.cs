@@ -33,6 +33,7 @@ namespace Kaalcharakk.Services.WishlistServices
                     ProductId = item.ProductId,
                     ProductName = item.Product.Name,
                     Price = item.Product.Price,
+                    ImageUrl = item.Product.ImageUrl,
                 }).ToList()
             };
 

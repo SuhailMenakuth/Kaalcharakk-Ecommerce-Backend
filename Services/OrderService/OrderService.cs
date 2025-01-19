@@ -4,6 +4,7 @@ using Kaalcharakk.Dtos.ProductDtos;
 using Kaalcharakk.Helpers.RazorPayHelper;
 using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
+using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.OrderRepository;
 using Kaalcharakk.Services.AddressService;
 
@@ -14,15 +15,17 @@ namespace Kaalcharakk.Services.OrderService
         private readonly IOrderRepository _orderRepository;
         private readonly IRazorpayHelper _razorpayHelper;
         private readonly IMapper _mapper;
-        private readonly IAddressService _addressService; 
+        private readonly IAddressService _addressService;
+        private readonly ICartRepository _cartRepository;
 
 
-        public OrderService(IOrderRepository orderRepository, IRazorpayHelper razorpayHelper,IMapper mapper , IAddressService addressService)
+        public OrderService(IOrderRepository orderRepository, IRazorpayHelper razorpayHelper,IMapper mapper , IAddressService addressService , ICartRepository cartRepository)
         {
             _orderRepository = orderRepository;
             _razorpayHelper = razorpayHelper;
             _mapper = mapper;
             _addressService = addressService;
+            _cartRepository = cartRepository;
             
         }
 
@@ -41,16 +44,16 @@ namespace Kaalcharakk.Services.OrderService
                 var userAdress = await _addressService.GetShippingAddressesAsync(userId);
                 if (!userAdress.Data.Any())
                 {
-                    return new ApiResponse<string>(404, "Address canot be empty", error: "you dont have any adress");
+                    return new ApiResponse<string>(404, "not found", error: "Address canot be empty");
                 }
 
-                if (!await _orderRepository.ValidateCartStockAsync(userId))
-                return new ApiResponse<string>(400,"Insufficient stock");
 
-           
-            var razorpayOrderId = await _razorpayHelper.CreateRazorpayOrder((long)createOrderDto.Totalamount);
+                var response = await _orderRepository.ValidateCartStockAsync(userId);
+                if (response.StatusCode == 400) return response;
+               
+                var razorpayOrderId = await _razorpayHelper.CreateRazorpayOrder((long)createOrderDto.Totalamount);
 
-           
+            
             createOrderDto.TransactionId = razorpayOrderId;
             var order = await _orderRepository.CreateOrderAsync(userId, createOrderDto);
 

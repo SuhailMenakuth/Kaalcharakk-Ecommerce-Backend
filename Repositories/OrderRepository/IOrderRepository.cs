@@ -1,4 +1,5 @@
 ﻿using Kaalcharakk.Dtos.OrderDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 
 namespace Kaalcharakk.Repositories.OrderRepository
@@ -13,7 +14,7 @@ namespace Kaalcharakk.Repositories.OrderRepository
 
         Task<Order> CreateOrderAsync(int userId, CreateOrderDto createOrderDto);
         Task<bool> DecrementStockAsync(int productId, int quantity);
-        Task<bool> ValidateCartStockAsync(int userId);
+        Task<ApiResponse<string>> ValidateCartStockAsync(int userId);
         Task<List<Order>> GetOrdersByUserAsync(int userId);
 
         Task<Order> GetOrderByOrderId(int orderId);

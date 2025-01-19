@@ -1,5 +1,6 @@
 ﻿using Kaalcharakk.Configuration;
 using Kaalcharakk.Dtos.OrderDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,84 +19,46 @@ namespace Kaalcharakk.Repositories.OrderRepository
         {
             try
             {
-                
-            var userCart = await _context.Carts
-                .Include(x => x.Items)
-                .ThenInclude(x => x.Product)
-                .FirstOrDefaultAsync(x => x.UserId == userId);
 
-            if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
-            {
+                var userCart = await _context.Carts
+                    .Include(x => x.Items)
+                    .ThenInclude(x => x.Product)
+                    .FirstOrDefaultAsync(x => x.UserId == userId);
 
-                throw new Exception("Cart is empty or not found");
-            }
-
-
-            //foreach (var item in userCart.Items)
-            //{
-            //    var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-            //    if (product == null || product.Stock < item.Quantity || product.IsActive == false)
-            //        throw new Exception($"Insufficient stock for product: {item.Product.Name} ");
-
-            //    product.Stock -= item.Quantity;
-            //}
-            var errorMessages = new List<string>();
-
-            foreach (var item in userCart.Items)
-    {
-                var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-                if (product == null)
+                if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
                 {
-                    errorMessages.Add($"Product with ID {item.ProductId} does not exist.");
-                    continue;
+
+                    throw new Exception("Cart is empty or not found");
                 }
-
-                if (!product.IsActive)
+                var newOrder = new Order
                 {
-                    errorMessages.Add($"Product '{product.Name}' is not active.");
-                }
+                    UserId = userId,
+                    TotalAmount = createOrderDto.Totalamount,
+                    OrderStatus = OrderStatus.Pending,
+                    ShippingAddressId = createOrderDto.AddressId,
+                    TransactionId = createOrderDto.TransactionId,
+                    OrderItems = userCart.Items.Select(item => new OrderItem
+                    {
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        Price = item.Product.Price,
+                        TotalPrice = item.Product.Price * item.Quantity
+                    }).ToList()
+                };
 
-                if (product.Stock < item.Quantity)
-                {
-                    errorMessages.Add($"Insufficient stock for product '{product.Name}'. Available stock: {product.Stock}, required: {item.Quantity}.");
-                }
-                product.Stock -= item.Quantity;
-            }
-
-            // If there are errors, return them as part of the response
-            if (errorMessages.Any())
-            {
-                throw new Exception(string.Join(" | ", errorMessages));
-            }
-
-            var newOrder = new Order
-            {
-                UserId = userId,
-                TotalAmount = createOrderDto.Totalamount,
-                OrderStatus = OrderStatus.Pending,
-                ShippingAddressId = createOrderDto.AddressId,
-                TransactionId = createOrderDto.TransactionId,
-                OrderItems = userCart.Items.Select(item => new OrderItem
-                {
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    Price = item.Product.Price,
-                    TotalPrice = item.Product.Price * item.Quantity
-                }).ToList()
-            };
-
-            await _context.Orders.AddAsync(newOrder);
-            _context.Carts.Remove(userCart);
-
-            await _context.SaveChangesAsync();
-            return newOrder;
+                await _context.Orders.AddAsync(newOrder);
+                _context.Carts.Remove(userCart);
+                await _context.SaveChangesAsync();
+                return newOrder;
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception($"error occured when creating order {ex.InnerException}");
             }
         }
 
+
+        
         public async Task<bool> DecrementStockAsync(int productId, int quantity)
         {
             var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == productId);
@@ -107,19 +70,57 @@ namespace Kaalcharakk.Repositories.OrderRepository
             return true;
         }
 
-        public async Task<bool> ValidateCartStockAsync(int userId)
+        public async Task<ApiResponse<string>> ValidateCartStockAsync(int userId)
         {
-            var userCart = await _context.Carts.Include(x => x.Items).FirstOrDefaultAsync(x => x.UserId == userId);
-            if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
-                return false;
+            try
+            {
+
+             var userCart = await _context.Carts.Include(x => x.Items).FirstOrDefaultAsync(x => x.UserId == userId);
+            if (userCart == null)
+            {
+                return new ApiResponse<string>(404, "not found", error: "you dont have cart ");
+
+            }
+            if (!userCart.Items.Any())
+            {
+                return new ApiResponse<string>(404, "cart is empty", error: "you dont have any items in your cart");
+
+            }
+            //if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
+            //    return false;
+
+            var errorMessages = new List<string>();
+
 
             foreach (var item in userCart.Items)
-            {
+            { 
                 var product = await _context.Products.FirstOrDefaultAsync(x => x.ProductId == item.ProductId);
-                if (product == null || product.Stock < item.Quantity)
-                    return false;
+                if (product == null)
+                {
+                    errorMessages.Add($"Product with ID {item.ProductId} does not exist.");
+                    continue;
+                }
+                if ( product.Stock < item.Quantity )
+                {
+                    errorMessages.Add($"Insufficient stock for product '{product.Name}'. Available stock: {product.Stock}");
+                }
+                if (product.IsActive == false)
+                {
+                    errorMessages.Add($"Product '{product.Name}' is not active.");
+                }
+                product.Stock -= item.Quantity;
             }
-            return true;
+
+            if (errorMessages.Any())
+            {
+                return new ApiResponse<string>(400, "Bad request", error: string.Join(" | ", errorMessages));
+            }
+            return new ApiResponse<string>(200, "success","product validarion successfull");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal server error {ex.InnerException}");
+            }
         }
 
         public async Task<List<Order>> GetOrdersByUserAsync(int userId)

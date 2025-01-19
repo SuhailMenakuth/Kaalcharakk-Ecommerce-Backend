@@ -22,8 +22,17 @@ namespace Kaalcharakk.Models
         [Required]
         public string Color {  get; set; }
 
+        private int _stock;
         [Required]
-        public int Stock {  get; set; }
+        public int Stock
+        {
+            get => _stock;
+            set
+            {
+                _stock = value;
+                IsActive = _stock > 0; 
+            }
+        }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Offer { get; set; } = 0;

@@ -160,7 +160,7 @@ namespace Kaalcharakk.Controllers
             }
             return Ok(response);
 
-            return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
+            //return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
         }
     }
 
