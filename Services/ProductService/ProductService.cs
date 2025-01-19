@@ -166,29 +166,45 @@ namespace Kaalcharakk.Services.ProductService
             }
             catch (Exception ex)
             {
-                throw new Exception($"internal server error , {ex.Message}");
+                throw new Exception($"internal server error  , {ex.Message}");
             }
         }
 
-        public async Task<List<ProductViewDto>> GetProductsByFilterServiceAsync(ProductFilterDto filterDto)
+        public async Task< ApiResponse< List<ProductViewDto>>> GetProductsByFilterServiceAsync(ProductFilterDto filterDto)
         {
-            var products = await _productRepository.GetProductsByFilterAsync(filterDto);
-
-            return products.Select(product => new ProductViewDto
+            try
             {
-                ProductId = product.ProductId,
-                Name = product.Name,
-                Category = product.Category.Name, 
-                Price = product.Price,
-                ImageUrl = product.ImageUrl,
-                Stock = product.Stock,
-                Color = product.Color,
-                Offer = product.Offer,
-                OfferStartingDate = product.OfferStartingDate,
-                OfferEndingDate = product.OfferEndingDate,
-                IsActive = product.IsActive
-            }).ToList();
+                
+
+                var products = await _productRepository.GetProductsByFilterAsync(filterDto);
+
+                var filteredProducts = products.Select(product => new ProductViewDto
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Category = product.Category.Name,
+                    Price = product.Price,
+                    ImageUrl = product.ImageUrl,
+                    Stock = product.Stock,
+                    Color = product.Color,
+                    Offer = product.Offer,
+                    OfferStartingDate = product.OfferStartingDate,
+                    OfferEndingDate = product.OfferEndingDate,
+                    IsActive = product.IsActive
+                }).ToList();
+
+                if (filteredProducts.Count < 1)
+                {
+                    return new ApiResponse<List<ProductViewDto>>(204, "no content");
+                }
+                return new ApiResponse<List<ProductViewDto>>(200, "success", filteredProducts);
+            }
+            catch (Exception ex) {
+                throw new Exception($"internal server erro{ex.InnerException}");
+                    }
+
         }
+        
 
 
         public async Task<ApiResponse<string>> ActivaeOrDeactivateProductByIdServiceAsync(int id, bool activate)

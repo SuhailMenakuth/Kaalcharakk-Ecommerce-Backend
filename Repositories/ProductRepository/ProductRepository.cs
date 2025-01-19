@@ -57,7 +57,7 @@ namespace Kaalcharakk.Repositories.ProductRepository
 
         public async Task<List<Product>> GetProductsByFilterAsync(ProductFilterDto filterDto)
         {
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
+            var query = _context.Products.Include(p => p.Category).Where(p=> p.IsActive == true);
 
             if (filterDto.MinPrice.HasValue)
             {
@@ -72,14 +72,15 @@ namespace Kaalcharakk.Repositories.ProductRepository
             {
                 query = query.Where(p => p.Color == filterDto.Color);
             }
-            if (!string.IsNullOrEmpty(filterDto.Category))
+            if (!string.IsNullOrEmpty(filterDto.CategoryName))
             {
-                query = query.Where(p => p.Category.Name == filterDto.Category);
+                query = query.Where(p => p.Category.Name == filterDto.CategoryName);
             }
 
             
 
-            return await query.ToListAsync();
+            var filteredProducts = await query.ToListAsync();
+            return filteredProducts;
         }
 
         public async Task<bool> UpdateProductAsync(Product product)

@@ -101,7 +101,8 @@ namespace Kaalcharakk.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { ex.Message });
+              //  return StatusCode(500, new { ex.Message });
+              return StatusCode(500, ex);
             }
 
         }
@@ -115,6 +116,11 @@ namespace Kaalcharakk.Controllers
             try
             {
                 var response = await _productService.GetProductsByFilterServiceAsync(filterCriteria);
+
+                if(response.StatusCode == 204)
+                {
+                    return StatusCode(204, response);
+                }
                 return Ok(response);
             }
             catch (Exception ex)
