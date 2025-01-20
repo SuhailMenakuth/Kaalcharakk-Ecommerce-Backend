@@ -8,6 +8,11 @@ namespace Kaalcharakk.Repositories.AuthRepository
         Task AddUserAsync(User userr);
         Task<bool> GetUserByPhoneAsync(string phone);
 
+        // pending
+
+        Task SaveRefreshTokenAsync(int userId, string refreshToken, DateTime expiryDate);
+        Task<RefreshToken?> GetRefreshTokenAsync(string refreshToken);
+        Task<User?> GetUserByIdAsync(int userId);
 
 
 

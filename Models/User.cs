@@ -49,5 +49,10 @@ namespace Kaalcharakk.Models
         public virtual ICollection<Order> Orders { get; set; }
 
 
+        //pending
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; }  // Added RefreshToken relationship
+
+
+
     }
 }

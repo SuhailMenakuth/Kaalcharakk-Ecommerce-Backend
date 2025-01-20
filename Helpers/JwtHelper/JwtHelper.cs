@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
@@ -41,19 +42,7 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
                 // Define claims
                 var claims = new[]
                 {
-                //    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                //    new Claim(ClaimTypes.Role, user.Role.RoleName),
-                //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-
-
-                //    new Claim(ClaimTypes.NameIdentifier,user.UserId.ToString()),
-                //new Claim(ClaimTypes.Name,user.Name),
-                //new Claim(ClaimTypes.Role,user.Role),
-                //new Claim(ClaimTypes.Email,user.Email),
-
-
-
-                     //new Claim(JwtRegisteredClaimNames.Sub, user.Email), // user email (subject)
+               
             new Claim(ClaimTypes.Role, user.Role.RoleName),      // user role (role name)
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
 
@@ -79,5 +68,40 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
                 throw new Exception("An error occurred while generating the token.", ex);
             }
         }
+
+        // pending
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
+        public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+        {
+            var secretKey = _configuration["Jwt:SecretKey"];
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = false // Allow expired tokens
+                }, out _);
+
+                return principal;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
+
+
 }

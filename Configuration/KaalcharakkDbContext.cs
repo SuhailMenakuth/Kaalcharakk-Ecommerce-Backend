@@ -37,6 +37,10 @@ namespace Kaalcharakk.Configuration
         public DbSet<ShippingAddress> shippingAddresses { get; set; }
 
 
+        //pending
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -183,6 +187,26 @@ namespace Kaalcharakk.Configuration
                 .Property(p => p.TotalPrice)
                 .HasColumnType("decimal(12,2)");
 
+
+
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasKey(rt => rt.Id); // Primary Key on Id
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User) // A refresh token is linked to a user
+                .WithMany() // A user can have many refresh tokens (optional, for history tracking)
+                .HasForeignKey(rt => rt.UserId) // Foreign key is UserId
+                .OnDelete(DeleteBehavior.Cascade); // When a user is deleted, their refresh tokens should be deleted
+
+            modelBuilder.Entity<RefreshToken>()
+                .Property(rt => rt.Token)
+                .IsRequired() // Token is required
+                .HasMaxLength(500); // Optional: Set a max length for the token
+
+            modelBuilder.Entity<RefreshToken>()
+                .Property(rt => rt.ExpiryDate)
+                .IsRequired(); // ExpiryDate is required
 
 
         }
