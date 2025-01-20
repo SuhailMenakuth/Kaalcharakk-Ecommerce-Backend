@@ -1,4 +1,5 @@
 ﻿using Kaalcharakk.Dtos.WishlistDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 
 namespace Kaalcharakk.Services.WishlistServices
@@ -11,11 +12,11 @@ namespace Kaalcharakk.Services.WishlistServices
         //Task RemoveAllItemsAsync(int userId);
 
 
-        Task<WishlistResponseDto> GetWishlistAsync(int userId);
-        Task AddItemAsync(int userId, int productId);
-        Task MoveToCartAsync(int userId, int productId);
-        Task RemoveItemAsync(int userId, int productId);
-        Task RemoveAllItemsAsync(int userId);
+        Task<ApiResponse<WishlistResponseDto>> GetWishlistAsync(int userId);
+        Task<ApiResponse<string>> AddItemAsync(int userId, int productId);
+        Task<ApiResponse<string>> MoveToCartAsync(int userId, int productId);
+        Task<ApiResponse<string>> RemoveItemAsync(int userId, int productId);
+        Task<ApiResponse<string>> RemoveAllItemsAsync(int userId);
 
 
         //Task<Wishlist> GetWishlistByUserIdAsync(int userId);

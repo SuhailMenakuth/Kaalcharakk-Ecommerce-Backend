@@ -20,6 +20,12 @@ namespace Kaalcharakk.Repositories.OrderRepository
         Task<Order> GetOrderByOrderId(int orderId);
         Task<bool> UpdateOrderAsync(Order order);
         Task<List<Order>> GetAllOrdersAsync();
+        Task<List<Order>> GetAllPendingOrdersAsync();
+        Task<List<Order>> GetAllProcessingOrdersAsync();
+        Task<List<Order>> GetAllDeliveredOrdersAsync();
+        Task<List<Order>> GetAllCancelledOrdersAsync();
+
+        Task<List<Order>> GetAllShippedOrdersAsync();
 
 
 

@@ -83,9 +83,6 @@ namespace Kaalcharakk.Services.ProductService
                     ImageUrl = RetrivedProduct.ImageUrl,
                     Color = RetrivedProduct.Color,
                     Stock = RetrivedProduct.Stock,
-                    Offer = RetrivedProduct.Offer,
-                    OfferStartingDate = RetrivedProduct.OfferStartingDate,
-                    OfferEndingDate = RetrivedProduct.OfferEndingDate,
                     IsActive = RetrivedProduct.IsActive
                 };
 
@@ -118,9 +115,6 @@ namespace Kaalcharakk.Services.ProductService
                     ImageUrl = p.ImageUrl,
                     Color = p.Color,
                     Stock = p.Stock,
-                    Offer = p.Offer,
-                    OfferStartingDate = p.OfferStartingDate,
-                    OfferEndingDate = p.OfferEndingDate,
                     IsActive = p.IsActive
                     
 
@@ -154,9 +148,6 @@ namespace Kaalcharakk.Services.ProductService
                     ImageUrl = p.ImageUrl,
                     Color = p.Color,
                     Stock = p.Stock,
-                    Offer = p.Offer,
-                    OfferStartingDate = p.OfferStartingDate,
-                    OfferEndingDate = p.OfferEndingDate,
                     IsActive = p.IsActive
 
 
@@ -187,9 +178,6 @@ namespace Kaalcharakk.Services.ProductService
                     ImageUrl = product.ImageUrl,
                     Stock = product.Stock,
                     Color = product.Color,
-                    Offer = product.Offer,
-                    OfferStartingDate = product.OfferStartingDate,
-                    OfferEndingDate = product.OfferEndingDate,
                     IsActive = product.IsActive
                 }).ToList();
 
@@ -261,9 +249,6 @@ namespace Kaalcharakk.Services.ProductService
                 existingProduct.CategoryId = updateProductDto.CategoryId ?? existingProduct.CategoryId;
                 existingProduct.Color = updateProductDto.Color ?? existingProduct.Color; 
                 existingProduct.Stock = updateProductDto.Stock ?? existingProduct.Stock;
-                existingProduct.Offer = updateProductDto.Offer ?? existingProduct.Offer;
-                existingProduct.OfferStartingDate = updateProductDto.OfferStartingDate ?? DateTime.UtcNow;
-                existingProduct.OfferEndingDate = updateProductDto.OfferEndingDate ?? DateTime.UtcNow;
                 existingProduct.IsActive = updateProductDto.IsActive ?? existingProduct.IsActive;
 
                 

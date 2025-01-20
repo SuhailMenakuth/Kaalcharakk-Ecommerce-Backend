@@ -14,6 +14,14 @@ namespace Kaalcharakk.Services.OrderService
         Task<ApiResponse<string>> UpdateOrderStatus(int orderId, OrderStatus status);
 
         Task<ApiResponse<List<OrderViewDto>>> GetAllOrderServiceAsync();
+
+        Task<ApiResponse<List<OrderViewDto>>> GetAllPendingOrdersServiceAsync();
+        Task<ApiResponse<List<OrderViewDto>>> GetAllProcessingOrdersServiceAsync();
+        Task<ApiResponse<List<OrderViewDto>>> GetAllDeliveredOrdersServiceAsync();
+        Task<ApiResponse<List<OrderViewDto>>> GetAllCancelledOrdersServiceAsync();
+       Task<ApiResponse<List<OrderViewDto>>> GetAllShippedOrdersServiceAsync();
+
+
     }
 
 

@@ -6,7 +6,10 @@ using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.OrderRepository;
+using Kaalcharakk.Repositories.ProductRepository;
 using Kaalcharakk.Services.AddressService;
+using Razorpay.Api;
+using System.Runtime.CompilerServices;
 
 namespace Kaalcharakk.Services.OrderService
 {
@@ -17,15 +20,16 @@ namespace Kaalcharakk.Services.OrderService
         private readonly IMapper _mapper;
         private readonly IAddressService _addressService;
         private readonly ICartRepository _cartRepository;
+        private readonly IProductRepository _productRepository;
 
 
-        public OrderService(IOrderRepository orderRepository, IRazorpayHelper razorpayHelper,IMapper mapper , IAddressService addressService , ICartRepository cartRepository)
+        public OrderService(IOrderRepository orderRepository, IRazorpayHelper razorpayHelper,IMapper mapper , IAddressService addressService , ICartRepository cartRepository , IProductRepository productRepository)
         {
             _orderRepository = orderRepository;
             _razorpayHelper = razorpayHelper;
             _mapper = mapper;
             _addressService = addressService;
-            _cartRepository = cartRepository;
+            _productRepository = productRepository;
             
         }
 
@@ -132,20 +136,43 @@ namespace Kaalcharakk.Services.OrderService
             {
                 return new ApiResponse<string>(400, "Invalid order status value");
             }
-            var res = await _orderRepository.GetOrderByOrderId(orderId);
+            var order = await _orderRepository.GetOrderByOrderId(orderId);
 
-            if (res == null)
+            if (order == null)
             {
                 return new ApiResponse<string>(404, "order canot found ");
             }
 
-            res.OrderStatus = status;
+            order.OrderStatus = status;
 
-            var isUpdated = await _orderRepository.UpdateOrderAsync(res);
+
+            var isUpdated = await _orderRepository.UpdateOrderAsync(order);
             if (!isUpdated)
             {
                 return new ApiResponse<string>(500, "internal server error ", error:"error occured when updating the order status");
             }
+
+
+            if(status == OrderStatus.Cancelled)
+            {
+                foreach(var orderItem in order.OrderItems)
+                {
+                    var product = await _productRepository.GetProductByIdAsync(orderItem.ProductId);
+                    if(product != null)
+                    {
+                        product.Stock += orderItem.Quantity;
+                        var isProductUpdated = await _productRepository.UpdateProductAsync(product);
+
+                        if (!isProductUpdated)
+                        {
+                            return new ApiResponse<string>(500, "Internal server error", error: $"Failed to update stock for product ID {orderItem.ProductId}");
+                        }
+                    }
+                }
+            }
+
+            
+         
             
             return new ApiResponse<string>(200, "success","order Updated succesfully");
 
@@ -154,16 +181,18 @@ namespace Kaalcharakk.Services.OrderService
 
         public async Task<ApiResponse<List<OrderViewDto>>> GetAllOrderServiceAsync()
         {
-            // Fetch all orders from the repository
+
+            try
+            {
+
+            
             var orders = await _orderRepository.GetAllOrdersAsync();
 
-            // Check if orders are null or empty
             if (orders == null || !orders.Any())
             {
-                return new ApiResponse<List<OrderViewDto>>(404, "No orders found.");
+                return new ApiResponse<List<OrderViewDto>>(200, "Success." , error:"There is no orders currenetly" );
             }
 
-            // Map orders to OrderViewDto
             var orderViewDtos = orders.Select(order => new OrderViewDto
             {
                 TransactionId = order.TransactionId,
@@ -177,12 +206,201 @@ namespace Kaalcharakk.Services.OrderService
                     ProductName = oi.Product?.Name ?? "Unknown Product",
                     Quantity = oi.Quantity,
                     Price = oi.Price * oi.Quantity,
+                    TotalPrice = oi.TotalPrice,
                 }).ToList() ?? new List<OrderItemDto>()
             }).ToList();
-
-            // Return the API response
             return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal server error , {ex.InnerException}");
+            }
+
+           
         }
+
+         public  async Task<ApiResponse<List<OrderViewDto>>> GetAllPendingOrdersServiceAsync()
+         {
+
+            try
+            {
+
+              var PendingOrders = await _orderRepository.GetAllPendingOrdersAsync();
+            if (PendingOrders == null || !PendingOrders.Any())
+            {
+                return new ApiResponse<List<OrderViewDto>>(200, "success" , error:"no pending orders currently");
+            }
+            var orderViewDtos = PendingOrders.Select(order => new OrderViewDto
+            {
+                TransactionId = order.TransactionId,
+                TotalAmount = order.TotalAmount,
+                OrderStatus = order.OrderStatus.ToString(),
+                DeliveryAdrress = order.ShippingAddress?.Address ?? "No address provided",
+                Phone = order.ShippingAddress?.Phone ?? "No phone number provided",
+                OrderDate = order.OrderDate,
+                Items = order.OrderItems?.Select(oi => new OrderItemDto
+                {
+                    ProductName = oi.Product?.Name ?? "Unknown Product",
+                    Quantity = oi.Quantity,
+                    Price = oi.Price * oi.Quantity,
+                    TotalPrice = oi.TotalPrice,
+                }).ToList() ?? new List<OrderItemDto>()
+            }).ToList();
+            return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal server error , Message : {ex.Message} , InnerException : {ex.InnerException}");
+            }
+
+
+        }
+
+        public async Task<ApiResponse<List<OrderViewDto>>> GetAllProcessingOrdersServiceAsync()
+        {
+            try
+            {
+
+                var ProcessingOrders = await _orderRepository.GetAllPendingOrdersAsync();
+                if (ProcessingOrders == null || !ProcessingOrders.Any())
+                {
+                    return new ApiResponse<List<OrderViewDto>>(200, "success", error: "no pending orders currently");
+                }
+                var orderViewDtos = ProcessingOrders.Select(order => new OrderViewDto
+                {
+                    TransactionId = order.TransactionId,
+                    TotalAmount = order.TotalAmount,
+                    OrderStatus = order.OrderStatus.ToString(),
+                    DeliveryAdrress = order.ShippingAddress?.Address ?? "No address provided",
+                    Phone = order.ShippingAddress?.Phone ?? "No phone number provided",
+                    OrderDate = order.OrderDate,
+                    Items = order.OrderItems?.Select(oi => new OrderItemDto
+                    {
+                        ProductName = oi.Product?.Name ?? "Unknown Product",
+                        Quantity = oi.Quantity,
+                        Price = oi.Price * oi.Quantity,
+                        TotalPrice = oi.TotalPrice,
+
+
+                    }).ToList() ?? new List<OrderItemDto>()
+                }).ToList();
+                return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+            }
+            catch (Exception ex)
+            {
+                throw;
+                    //new Exception($"Service error: {ex.Message}", ex); 
+            }
+        }
+
+
+       public async Task<ApiResponse<List<OrderViewDto>>> GetAllDeliveredOrdersServiceAsync()
+        {
+            try
+            {
+
+                var DeliveredOrders = await _orderRepository.GetAllDeliveredOrdersAsync();
+                if (DeliveredOrders == null || !DeliveredOrders.Any())
+                {
+                    return new ApiResponse<List<OrderViewDto>>(200, "success", error: "no pending orders currently");
+                }
+                var orderViewDtos = DeliveredOrders.Select(order => new OrderViewDto
+                {
+                    TransactionId = order.TransactionId,
+                    TotalAmount = order.TotalAmount,
+                    OrderStatus = order.OrderStatus.ToString(),
+                    DeliveryAdrress = order.ShippingAddress?.Address ?? "No address provided",
+                    Phone = order.ShippingAddress?.Phone ?? "No phone number provided",
+                    OrderDate = order.OrderDate,
+                    Items = order.OrderItems?.Select(oi => new OrderItemDto
+                    {
+                        ProductName = oi.Product?.Name ?? "Unknown Product",
+                        Quantity = oi.Quantity,
+                        Price = oi.Price * oi.Quantity,
+                        TotalPrice = oi.TotalPrice,
+                    }).ToList() ?? new List<OrderItemDto>()
+                }).ToList();
+                return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+            }
+            catch (Exception ex)
+            {
+                throw;
+                //new Exception($"Service error: {ex.Message}", ex); 
+            }
+        }
+
+        public async Task<ApiResponse<List<OrderViewDto>>> GetAllCancelledOrdersServiceAsync()
+        {
+            try
+            {
+
+                var CancelledOrders = await _orderRepository.GetAllCancelledOrdersAsync();
+                if (CancelledOrders == null || !CancelledOrders.Any())
+                {
+                    return new ApiResponse<List<OrderViewDto>>(200, "success", error: "no pending orders currently");
+                }
+                var orderViewDtos = CancelledOrders.Select(order => new OrderViewDto
+                {
+                    TransactionId = order.TransactionId,
+                    TotalAmount = order.TotalAmount,
+                    OrderStatus = order.OrderStatus.ToString(),
+                    DeliveryAdrress = order.ShippingAddress?.Address ?? "No address provided",
+                    Phone = order.ShippingAddress?.Phone ?? "No phone number provided",
+                    OrderDate = order.OrderDate,
+                    Items = order.OrderItems?.Select(oi => new OrderItemDto
+                    {
+                        ProductName = oi.Product?.Name ?? "Unknown Product",
+                        Quantity = oi.Quantity,
+                        Price = oi.Price * oi.Quantity,
+                        TotalPrice = oi.TotalPrice,
+                    }).ToList() ?? new List<OrderItemDto>()
+                }).ToList();
+                return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+            }
+            catch (Exception ex)
+            {
+                throw;
+                //new Exception($"Service error: {ex.Message}", ex); 
+            }
+        }
+
+
+       public async Task<ApiResponse<List<OrderViewDto>>> GetAllShippedOrdersServiceAsync()
+        {
+            try
+            {
+
+                var ShippedOrders = await _orderRepository.GetAllShippedOrdersAsync();
+                if (ShippedOrders == null || !ShippedOrders.Any())
+                {
+                    return new ApiResponse<List<OrderViewDto>>(200, "success", error: "no pending orders currently");
+                }
+                var orderViewDtos = ShippedOrders.Select(order => new OrderViewDto
+                {
+                    TransactionId = order.TransactionId,
+                    TotalAmount = order.TotalAmount,
+                    OrderStatus = order.OrderStatus.ToString(),
+                    DeliveryAdrress = order.ShippingAddress?.Address ?? "No address provided",
+                    Phone = order.ShippingAddress?.Phone ?? "No phone number provided",
+                    OrderDate = order.OrderDate,
+                    Items = order.OrderItems?.Select(oi => new OrderItemDto
+                    {
+                        ProductName = oi.Product?.Name ?? "Unknown Product",
+                        Quantity = oi.Quantity,
+                        Price = oi.Price * oi.Quantity,
+                        TotalPrice = oi.TotalPrice,
+                    }).ToList() ?? new List<OrderItemDto>()
+                }).ToList();
+                return new ApiResponse<List<OrderViewDto>>(200, "Orders retrieved successfully.", orderViewDtos);
+            }
+            catch (Exception ex)
+            {
+                throw;
+                //new Exception($"Service error: {ex.Message}", ex); 
+            }
+        }
+
+
 
     }
 }

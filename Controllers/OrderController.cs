@@ -53,6 +53,7 @@ namespace Kaalcharakk.Controllers
 
 
         [HttpGet("my-orders")]
+        [Authorize]
         public async Task<IActionResult> GetOrders()
         {
             try
@@ -136,13 +137,123 @@ namespace Kaalcharakk.Controllers
 
         }
 
-        [HttpPatch("get-all-orders")]
+        [HttpGet("get-all-orders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllOrders()
         {
+            try
+            {
+
            var response = await _orderService.GetAllOrderServiceAsync();
             return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
+
+        [HttpGet("get-all-PendingOrders")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllPendingOrders()
+        {
+            try
+            {
+                var response = await _orderService.GetAllPendingOrdersServiceAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        } 
+        
+        
+        [HttpGet("get-all-ProcessingOrders")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllProcessingOrders()
+        {
+            try
+            {
+                var response = await _orderService.GetAllProcessingOrdersServiceAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    status = 500,
+                    error = "Internal Server Error",
+                    message = ex.Message 
+                });
+            }
+        }
+        [HttpGet("get-all-shipped-Orders")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllShippedOrders()
+        {
+            try
+            {
+                var response = await _orderService.GetAllShippedOrdersServiceAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    status = 500,
+                    error = "Internal Server Error",
+                    message = ex.Message 
+                });
+            }
+        } 
+        
+        
+        [HttpGet("get-all-Cancelled-orders")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllCancelledOrders()
+        {
+            try
+            {
+                var response = await _orderService.GetAllCancelledOrdersServiceAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    status = 500,
+                    error = "Internal Server Error",
+                    message = ex.Message 
+                });
+            }
+        }
+        [HttpGet("get-all-delivered-orders")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllDeliveredOrders()
+        {
+            try
+            {
+                var response = await _orderService.GetAllDeliveredOrdersServiceAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    status = 500,
+                    error = "Internal Server Error",
+                    message = ex.Message 
+                });
+            }
+        }
+
+
+
+
+
+
+
 
     }
 }

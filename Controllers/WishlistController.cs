@@ -16,66 +16,107 @@ namespace Kaalcharakk.Controllers
             _wishlistService = wishlistService;
         }
 
-        [HttpGet]
+        [HttpGet("get-mywishlist")]
         [Authorize]
         public async Task<IActionResult> GetWishlist()
         {
-            
+            try
+            {
+
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
-            var wishlist = await _wishlistService.GetWishlistAsync(userId);
-            if (wishlist == null)
-                return NotFound("Wishlist not found.");
-            return Ok(wishlist);
+            var resposnse = await _wishlistService.GetWishlistAsync(userId);
+            if (resposnse.StatusCode == 404)
+                return NotFound(resposnse);
+            return Ok(resposnse);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500,$"Message : {ex.Message}  Error : {ex.InnerException}" );
+            }
         }
 
-        [HttpPost("{productId}")]
+        [HttpPost("add-to-wishlist {productId}")]
         [Authorize]
         public async Task<IActionResult> AddToWishlist(int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             try
             {
-                await _wishlistService.AddItemAsync(userId, productId);
-                return Ok("Product added to wishlist.");
+               var response = await _wishlistService.AddItemAsync(userId, productId);
+               if(response.StatusCode == 409)
+                {
+                    return StatusCode(409, response);
+                }
+
+               if (response.StatusCode == 404)
+                {
+                    return NotFound(response);
+                }
+               if(response.StatusCode == 400)
+                {
+                    return BadRequest(response);
+                }
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Message : {ex.Message}  Error : {ex.InnerException}"); ;
             }
         }
 
+
+
         [HttpPost("move-to-cart/{productId}")]
+        [Authorize]
         public async Task<IActionResult> MoveToCart(int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             try
             {
-                await _wishlistService.MoveToCartAsync(userId, productId);
+                var  response =  await _wishlistService.MoveToCartAsync(userId, productId);
+                if(response.StatusCode == 400)
+                {
+                    return StatusCode(400, response);
+                }
+                if(response.StatusCode == 404)
+                {
+                    return StatusCode(404, response);
+                }
                 return Ok("Product moved to cart.");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Message : {ex.Message}  Error : {ex.InnerException}");
             }
         }
 
-        [HttpDelete("{productId}")]
+        [HttpDelete(" delete-product-{productId}")]
         [Authorize]
         public async Task<IActionResult> RemoveFromWishlist(int productId)
         {
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             try
             {
-                await _wishlistService.RemoveItemAsync(userId, productId);
-                return Ok("Product removed from wishlist.");
+               var response = await _wishlistService.RemoveItemAsync(userId, productId);
+                if (response.StatusCode == 404)
+                {
+                    return NotFound(response);
+                }
+                if (response.StatusCode == 400)
+                {
+                    return BadRequest(response);    
+                }
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Message : {ex.Message}  Error : {ex.InnerException}");
             }
         }
 
-        [HttpDelete]
+
+        [HttpDelete("clear-wishlist")]
         [Authorize]
         public async Task<IActionResult> ClearWishlist()
         {
@@ -83,12 +124,17 @@ namespace Kaalcharakk.Controllers
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             try
             {
-                await _wishlistService.RemoveAllItemsAsync(userId);
+               var response = await _wishlistService.RemoveAllItemsAsync(userId);
+                if(response.StatusCode == 400)
+                {
+                    return BadRequest(400);
+                }
+               
                 return Ok("Wishlist cleared.");
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, $"Message : {ex.Message}  Error : {ex.InnerException}");
             }
         }
     }

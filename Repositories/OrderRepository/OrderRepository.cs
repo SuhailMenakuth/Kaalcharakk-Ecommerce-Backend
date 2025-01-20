@@ -33,7 +33,7 @@ namespace Kaalcharakk.Repositories.OrderRepository
                 var newOrder = new Order
                 {
                     UserId = userId,
-                    TotalAmount = createOrderDto.Totalamount,
+                    TotalAmount = userCart.Items.Sum(item => item.Product.Price * item.Quantity),
                     OrderStatus = OrderStatus.Pending,
                     ShippingAddressId = createOrderDto.AddressId,
                     TransactionId = createOrderDto.TransactionId,
@@ -86,8 +86,7 @@ namespace Kaalcharakk.Repositories.OrderRepository
                 return new ApiResponse<string>(404, "cart is empty", error: "you dont have any items in your cart");
 
             }
-            //if (userCart == null || userCart.Items == null || userCart.Items.Count == 0)
-            //    return false;
+            
 
             var errorMessages = new List<string>();
 
@@ -132,39 +131,7 @@ namespace Kaalcharakk.Repositories.OrderRepository
                 .Where(o => o.UserId == userId)
                 .ToListAsync();
         }
-        //public async Task<Order> CreateOrderAsync(Order order)
-        //{
-        //    _context.Orders.Add(order);
-        //    await _context.SaveChangesAsync();
-        //    return order;
-        //}
-
-        //public async Task<Order> GetOrderAsync(int orderId)
-        //{
-        //    return await _context.Orders.FindAsync(orderId);
-        //}
-
-        //public async Task<List<Order>> GetOrdersAsync()
-        //{
-        //    return await _context.Orders.ToListAsync();
-        //}
-
-        //public async Task<bool> UpdateOrderAsync(Order order)
-        //{
-        //    _context.Orders.Update(order);
-        //    return await _context.SaveChangesAsync() > 0;
-        //}
-
-        //public async Task<bool> DeleteOrderAsync(int orderId)
-        //{
-        //    var order = await _context.Orders.FindAsync(orderId);
-        //    if (order != null)
-        //    {
-        //        _context.Orders.Remove(order);
-        //        return await _context.SaveChangesAsync() > 0;
-        //    }
-        //    return false;
-        //}
+        
 
 
         public async Task<Order> GetOrderByOrderId(int orderId)
@@ -182,6 +149,8 @@ namespace Kaalcharakk.Repositories.OrderRepository
             return await _context.Orders
                 .Include (o => o.User)
                 .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .Include(o => o.ShippingAddress)
                 .ToListAsync();
         }
 
@@ -191,6 +160,57 @@ namespace Kaalcharakk.Repositories.OrderRepository
             return await _context.SaveChangesAsync() > 0;
 
 
+        }
+
+        public async Task<List<Order>> GetAllPendingOrdersAsync()
+        {
+            return await _context.Orders
+              .Include(o => o.User)
+              .Include(o => o.OrderItems)
+              .ThenInclude(oi => oi.Product)
+              .Include(o => o.ShippingAddress)
+              .Where(o => o.OrderStatus == OrderStatus.Pending)
+              .ToListAsync();
+        }
+        public async Task<List<Order>> GetAllProcessingOrdersAsync()
+        {
+            return await _context.Orders
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .Include(o => o.ShippingAddress)
+            .Where(o => o.OrderStatus == OrderStatus.Processing)
+            .ToListAsync();
+        }
+        public async Task<List<Order>> GetAllDeliveredOrdersAsync()
+        {
+            return await _context.Orders
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .Include(o => o.ShippingAddress)
+            .Where(o => o.OrderStatus == OrderStatus.Delivered)
+            .ToListAsync();
+        }
+        public async Task<List<Order>> GetAllShippedOrdersAsync()
+        {
+            return await _context.Orders
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
+            .ThenInclude(oi => oi.Product)
+            .Include(o => o.ShippingAddress)
+            .Where(o => o.OrderStatus == OrderStatus.Shipped)
+            .ToListAsync();
+        }
+        public async Task<List<Order>> GetAllCancelledOrdersAsync()
+        {
+            return await _context.Orders
+           .Include(o => o.User)
+           .Include(o => o.OrderItems)
+           .ThenInclude(oi => oi.Product)
+           .Include(o => o.ShippingAddress)
+           .Where(o => o.OrderStatus == OrderStatus.Cancelled)
+           .ToListAsync();
         }
     }
 

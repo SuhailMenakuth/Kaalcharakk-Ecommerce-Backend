@@ -1,4 +1,5 @@
 ﻿using Kaalcharakk.Dtos.WishlistDtos;
+using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Models;
 using Kaalcharakk.Repositories.CartRepository;
 using Kaalcharakk.Repositories.ProductRepository;
@@ -20,10 +21,13 @@ namespace Kaalcharakk.Services.WishlistServices
         }
 
         // Get wishlist for the user
-        public async Task<WishlistResponseDto> GetWishlistAsync(int userId)
+        public async Task<ApiResponse<WishlistResponseDto>> GetWishlistAsync(int userId)
         {
+            try
+            {
+
             var wishlist = await _wishlistRepository.GetWishlistByUserIdAsync(userId);
-            if (wishlist == null) return null;
+            if (wishlist == null) return new ApiResponse<WishlistResponseDto>(404, "not found", error: "you dont have any cart , please add a product to wishlist first"); 
 
             var response = new WishlistResponseDto
             {
@@ -37,21 +41,33 @@ namespace Kaalcharakk.Services.WishlistServices
                 }).ToList()
             };
 
-            return response;
+            return new ApiResponse<WishlistResponseDto>(200,"success",response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal exception {ex.Message}", ex);
+            }
         }
 
         // Add item to the wishlist
-        public async Task AddItemAsync(int userId, int productId)
+        public async Task<ApiResponse<string>> AddItemAsync(int userId, int productId)
         {
+            try
+            {
+
             var product = await _productRepository.GetProductByIdAsync(productId);
-            if (product == null || product.Stock < 1)
-                throw new Exception("Product not available or insufficient stock.");
+            if (product == null )
+                return new ApiResponse<string>(400, "not found", error: "product not found");
+             if( product.Stock < 1)
+            {
+                return new ApiResponse<string>(404, "not found", error: "Product is out of stock");
+            }
 
             var wishlist = await _wishlistRepository.GetWishlistByUserIdAsync(userId)
                             ?? await _wishlistRepository.CreateWishlistAsync(userId);
 
             if (wishlist.Items.Any(item => item.ProductId == productId))
-                throw new Exception("Product already in wishlist.");
+                return new ApiResponse<string>(409, "Conflict", error: "Product is already in the wishlist.");
 
             wishlist.Items.Add(new WishlistItem
             {
@@ -59,16 +75,29 @@ namespace Kaalcharakk.Services.WishlistServices
             });
 
             await _wishlistRepository.UpdateWishlistAsync(wishlist);
+
+            return new ApiResponse<string>(200, "success", $"Product added to wishlist {product.Name} ");
+            }
+            catch(Exception ex)
+            {
+                throw new Exception($"internal exception {ex.Message}", ex);
+            }
         }
 
         // Move item to cart
-        public async Task MoveToCartAsync(int userId, int productId)
+        public async Task<ApiResponse<string>> MoveToCartAsync(int userId, int productId)
         {
+            try
+            {
+
             var wishlist = await _wishlistRepository.GetWishlistByUserIdAsync(userId);
-            if (wishlist == null) throw new Exception("Wishlist not found.");
+
+            if (wishlist == null) return new ApiResponse<string>(400, "BadRequest", error: "no whishlist");
 
             var wishlistItem = wishlist.Items.FirstOrDefault(item => item.ProductId == productId);
-            if (wishlistItem == null) throw new Exception("Item not found in wishlist.");
+            if (wishlistItem == null) return new ApiResponse<string>(404, "not found", error: "your wishlist is empty");
+             
+
 
             // Remove from wishlist
             //wishlist.Items.Remove(wishlistItem);
@@ -93,29 +122,57 @@ namespace Kaalcharakk.Services.WishlistServices
             }
 
             await _cartRepository.UpdateCartAsync(cart);
+            return new ApiResponse<string>(200, "success", $"Product added to cart {productId}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal exception {ex.Message}", ex);
+            }
         }
 
         // Remove item from the wishlist
-        public async Task RemoveItemAsync(int userId, int productId)
+        public async Task<ApiResponse<string>> RemoveItemAsync(int userId, int productId)
         {
+            try
+            {
+
             var wishlist = await _wishlistRepository.GetWishlistByUserIdAsync(userId);
-            if (wishlist == null) throw new Exception("Wishlist not found.");
 
-            var wishlistItem = wishlist.Items.FirstOrDefault(item => item.ProductId == productId);
-            if (wishlistItem == null) throw new Exception("Item not found in wishlist.");
+            if (wishlist == null) return new ApiResponse<string>(400, "BadRequest", error: "you dont have wishlist");
+                    
 
-            wishlist.Items.Remove(wishlistItem);
+            var product = wishlist.Items.FirstOrDefault(item => item.ProductId == productId);
+            if (product == null) return new ApiResponse<string>(404, "not found", error: $"item {productId} not found in your wishlist ");
+          
+
+            wishlist.Items.Remove(product);
             await _wishlistRepository.UpdateWishlistAsync(wishlist);
+
+            return new ApiResponse<string>(200, "success", "product removed from the wishlist ");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal exception {ex.Message}", ex);
+            }
         }
 
         // Remove all items from the wishlist
-        public async Task RemoveAllItemsAsync(int userId)
+        public async Task<ApiResponse<string>> RemoveAllItemsAsync(int userId)
         {
+            try
+            {
+
             var wishlist = await _wishlistRepository.GetWishlistByUserIdAsync(userId);
-            if (wishlist == null) throw new Exception("Wishlist not found.");
+            if (wishlist == null) return new ApiResponse<string>(400, "BadRequest", error: " you dont have wishlist");
 
             wishlist.Items.Clear();
             await _wishlistRepository.UpdateWishlistAsync(wishlist);
+            return new ApiResponse<string>(200, "success", "wishlist cleared successfully");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"internal exception {ex.Message}", ex);
+            }
         }
     }
 }
