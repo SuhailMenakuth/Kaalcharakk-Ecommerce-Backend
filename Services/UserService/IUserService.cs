@@ -11,6 +11,8 @@ namespace Kaalcharakk.Services.UserService
 
         Task <ApiResponse<List<UserViewDto>>> FetchAllUserServiceAsync();
 
+        Task<ApiResponse<MyDetailsDto>> FetchMyDetailsAsync(int userId);
+
         
         
     }

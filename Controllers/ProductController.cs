@@ -47,7 +47,7 @@ namespace Kaalcharakk.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("product/{id}")]
         [Authorize]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -71,7 +71,7 @@ namespace Kaalcharakk.Controllers
             }
         }
 
-        [HttpGet("all-products-admin-view")]
+        [HttpGet("allproducts/admin-view")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllProducts()
         {
@@ -89,7 +89,7 @@ namespace Kaalcharakk.Controllers
         }
         
 
-        [HttpGet("all-active-products")]
+        [HttpGet("allactive/products")]
         [Authorize]
         public async Task<IActionResult> GetAllActiveProducts()
         {

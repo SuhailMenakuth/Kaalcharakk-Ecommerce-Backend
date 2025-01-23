@@ -19,6 +19,7 @@ namespace Kaalcharakk.Mapper
             CreateMap<ViewAddressDto , ShippingAddress>().ReverseMap();
             CreateMap<OrderViewDto , Order>().ReverseMap();
             CreateMap<UserViewDto, User>().ReverseMap();
+            CreateMap<MyDetailsDto, User>().ReverseMap();
 
            
         }   

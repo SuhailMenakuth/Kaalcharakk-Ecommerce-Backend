@@ -38,9 +38,9 @@ namespace Kaalcharakk.Services.CartService
             return response;
         }
 
-        public async Task<ApiResponse<string>> AddOrUpdateItemAsync(int userId, CartItemRequestDto requestDto)
+        public async Task<ApiResponse<string>> AddOrUpdateItemAsync(int userId, int productId)
         {
-            var product = await _productRepository.GetProductByIdAsync(requestDto.ProductId);
+            var product = await _productRepository.GetProductByIdAsync(productId);
             if (product == null 
                 //requestDto.Quantity
                 )
@@ -58,7 +58,7 @@ namespace Kaalcharakk.Services.CartService
 
             var cart = await _cartRepository.GetCartByUserIdAsync(userId) ?? await _cartRepository.CreateCartAsync(userId);
 
-            var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == requestDto.ProductId);
+            var cartItem = cart.Items.FirstOrDefault(item => item.ProductId == productId);
             if (cartItem != null)
             {
                 cartItem.Quantity += 1
@@ -75,14 +75,14 @@ namespace Kaalcharakk.Services.CartService
             {
                 cart.Items.Add(new CartItem
                 {
-                    ProductId = requestDto.ProductId,
+                    ProductId = productId ,
                     Quantity = 1
                     //requestDto.Quantity
                 });
             }
 
             await _cartRepository.UpdateCartAsync(cart);
-            return new ApiResponse<string>(200,"success", $"product added sucessfully {requestDto.ProductId}  ");
+            return new ApiResponse<string>(200,"success", $"product added sucessfully {productId}  ");
 
         }
 

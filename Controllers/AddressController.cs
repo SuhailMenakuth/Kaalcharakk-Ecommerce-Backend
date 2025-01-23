@@ -1,6 +1,7 @@
 ﻿using Kaalcharakk.Dtos.OrderDtos;
 using Kaalcharakk.Helpers.Response;
 using Kaalcharakk.Services.AddressService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace Kaalcharakk.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize]
         public async Task<IActionResult> CreateShippingAddress([FromBody] OrderAddressDto orderAddressDto)
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
@@ -30,7 +32,8 @@ namespace Kaalcharakk.Controllers
             return Ok(response);
         }
 
-        [HttpGet("get")]
+        [HttpGet("myadresses")]
+        [Authorize]
         public async Task<IActionResult> GetShippingAddresses()
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
@@ -44,6 +47,7 @@ namespace Kaalcharakk.Controllers
         }
 
         [HttpDelete("remove/{addressId}")]
+        [Authorize]
         public async Task<IActionResult> RemoveShippingAddress(int addressId)
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);

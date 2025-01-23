@@ -16,7 +16,7 @@ namespace Kaalcharakk.Controllers
             _wishlistService = wishlistService;
         }
 
-        [HttpGet("get-mywishlist")]
+        [HttpGet("get/mywishlist")]
         [Authorize]
         public async Task<IActionResult> GetWishlist()
         {
@@ -35,7 +35,7 @@ namespace Kaalcharakk.Controllers
             }
         }
 
-        [HttpPost("add-to-wishlist {productId}")]
+        [HttpPost("add/to-wishlist/{productId}")]
         [Authorize]
         public async Task<IActionResult> AddToWishlist(int productId)
         {
@@ -66,7 +66,7 @@ namespace Kaalcharakk.Controllers
 
 
 
-        [HttpPost("move-to-cart/{productId}")]
+        [HttpPost("movetocart/{productId}")]
         [Authorize]
         public async Task<IActionResult> MoveToCart(int productId)
         {
@@ -90,7 +90,7 @@ namespace Kaalcharakk.Controllers
             }
         }
 
-        [HttpDelete(" delete-product-{productId}")]
+        [HttpDelete(" delete/product/{productId}")]
         [Authorize]
         public async Task<IActionResult> RemoveFromWishlist(int productId)
         {
@@ -116,7 +116,7 @@ namespace Kaalcharakk.Controllers
         }
 
 
-        [HttpDelete("clear-wishlist")]
+        [HttpDelete("clear/wishlist")]
         [Authorize]
         public async Task<IActionResult> ClearWishlist()
         {

@@ -19,7 +19,7 @@ namespace Kaalcharakk.Controllers
             _orderService = orderService;
         }
 
-        [HttpPost("Place-order")]
+        [HttpPost("Place/order")]
         public async Task<IActionResult> PlaceOrder([FromBody] CreateOrderDto orderDto)
         {
             try
@@ -52,7 +52,7 @@ namespace Kaalcharakk.Controllers
 
 
 
-        [HttpGet("my-orders")]
+        [HttpGet("my/orders")]
         [Authorize]
         public async Task<IActionResult> GetOrders()
         {
@@ -80,7 +80,7 @@ namespace Kaalcharakk.Controllers
 
         //}
 
-        [HttpGet("retrive-order{orderId}")]
+        [HttpGet("retrive/order/{orderId}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetOrderById(int orderId)
         {
@@ -105,7 +105,7 @@ namespace Kaalcharakk.Controllers
 
         }
 
-        [HttpPatch("update-orders-status")]
+        [HttpPatch("update/orders/status")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateOrderStatus(int orderId , OrderStatus orderStatus)
         {
@@ -137,7 +137,7 @@ namespace Kaalcharakk.Controllers
 
         }
 
-        [HttpGet("get-all-orders")]
+        [HttpGet("get/all/orders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -153,7 +153,7 @@ namespace Kaalcharakk.Controllers
             }
         }
 
-        [HttpGet("get-all-PendingOrders")]
+        [HttpGet("get/all/PendingOrders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllPendingOrders()
         {
@@ -169,7 +169,7 @@ namespace Kaalcharakk.Controllers
         } 
         
         
-        [HttpGet("get-all-ProcessingOrders")]
+        [HttpGet("get/all/ProcessingOrders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllProcessingOrders()
         {
@@ -188,7 +188,7 @@ namespace Kaalcharakk.Controllers
                 });
             }
         }
-        [HttpGet("get-all-shipped-Orders")]
+        [HttpGet("get/all/shipped-Orders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllShippedOrders()
         {
@@ -209,7 +209,7 @@ namespace Kaalcharakk.Controllers
         } 
         
         
-        [HttpGet("get-all-Cancelled-orders")]
+        [HttpGet("get/all/Cancelled-orders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllCancelledOrders()
         {
@@ -228,7 +228,7 @@ namespace Kaalcharakk.Controllers
                 });
             }
         }
-        [HttpGet("get-all-delivered-orders")]
+        [HttpGet("get/all-delivered-orders")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllDeliveredOrders()
         {

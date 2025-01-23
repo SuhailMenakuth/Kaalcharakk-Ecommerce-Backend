@@ -128,6 +128,19 @@ namespace Kaalcharakk.Services.UserService
             }
         }
 
+        public async Task<ApiResponse<MyDetailsDto>> FetchMyDetailsAsync(int userId)
+        {
+            var myDetails = _userRepository.FetchUserByIdAsync(userId);
+
+            var myDetailsDto = _mapper.Map<MyDetailsDto>(myDetails);
+            if(myDetails == null)
+            {
+                return new ApiResponse<MyDetailsDto>(404, "not found", error: "internal server error");
+
+            }
+            return new ApiResponse<MyDetailsDto>(200, "success", myDetailsDto);
+        }
+
 
     }
 }

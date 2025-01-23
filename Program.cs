@@ -44,6 +44,23 @@ namespace Kaalcharakk
                         builder.Configuration.GetConnectionString("DefaultConnection"),
                         sqlOptions => sqlOptions.EnableRetryOnFailure())
             );
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:5173")
+                               .AllowAnyMethod()
+                               .AllowAnyHeader()
+                               .AllowCredentials(); 
+
+                    });
+            });
+
+
+
+
             builder.Services.AddAutoMapper(typeof(MapperProfile));
             //builder.Services.AddLogging();
 
@@ -149,7 +166,8 @@ namespace Kaalcharakk
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+            app.UseCors("AllowSpecificOrigin");
 
             // Add authentication before authorization
             app.UseAuthentication();

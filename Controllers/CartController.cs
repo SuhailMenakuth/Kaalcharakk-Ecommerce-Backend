@@ -18,7 +18,7 @@ namespace Kaalcharakk.Controllers
             _cartService = cartService;
         }
 
-        [HttpGet("my-cart")]
+        [HttpGet("mycart")]
         [Authorize]
         public async Task<IActionResult> GetCart()
         {
@@ -42,12 +42,12 @@ namespace Kaalcharakk.Controllers
         }
 
 
-        [HttpPost("addorupdate-cart")]
+        [HttpPost("add/update/tocart/{id}")]
         [Authorize]
-        public async Task<IActionResult> AddOrUpdateItem([FromBody] CartItemRequestDto request)
+        public async Task<IActionResult> AddOrUpdateItem( int id)
         {
             var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
-            var respose =await _cartService.AddOrUpdateItemAsync(userId, request);
+            var respose =await _cartService.AddOrUpdateItemAsync(userId, id);
             if(respose.StatusCode == 404)
             {
                 return StatusCode(404,new ApiResponse<string>(404, " Product not available"));
@@ -63,7 +63,7 @@ namespace Kaalcharakk.Controllers
             return Ok(respose);
         }
 
-        [HttpDelete("delete-product-{productId}")]
+        [HttpDelete("delete/product/{productId}")]
         [Authorize]
         public async Task<IActionResult> RemoveItem(int productId)
         {
@@ -82,7 +82,7 @@ namespace Kaalcharakk.Controllers
             return Ok(response);
         }
 
-        [HttpPost("increase-quantity/{productId}")]
+        [HttpPost("increase/quantity/{productId}")]
         [Authorize(Roles ="User")]
         public async Task<IActionResult> IncreaseQuantity( int productId)
         {

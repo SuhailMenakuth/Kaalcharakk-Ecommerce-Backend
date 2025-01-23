@@ -43,12 +43,12 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
                 var claims = new[]
                 {
                
-            new Claim(ClaimTypes.Role, user.Role.RoleName),      // user role (role name)
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
+                    new Claim(ClaimTypes.Role, user.Role.RoleName),      // user role (role name)
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
 
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // user ID (user identifier)
-            new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName), // user's full name
-            new Claim(ClaimTypes.Email, user.Email), // user's email (email claim)
+                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // user ID (user identifier)
+                    new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName), // user's full name
+                    new Claim(ClaimTypes.Email, user.Email), // user's email (email claim)
                         };
 
                 // Create the token

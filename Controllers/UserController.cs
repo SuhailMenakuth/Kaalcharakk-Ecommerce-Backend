@@ -18,7 +18,7 @@ namespace Kaalcharakk.Controllers
 
         //var userId = int.Parse(HttpContext.Items["UserId"].ToString());
 
-        [HttpPatch("Block-user")]
+        [HttpPatch("block/user")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> BlockUser(int userId)
         {
@@ -39,7 +39,7 @@ namespace Kaalcharakk.Controllers
 
         }
 
-        [HttpPatch("Unblock-user")]
+        [HttpPatch("unblock/user")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UnBlockUser(int userId)
         {
@@ -59,7 +59,7 @@ namespace Kaalcharakk.Controllers
 
         }
 
-        [HttpGet("user-details")]
+        [HttpGet("user/details")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> FetchlUserDetailsById(int userId)
         {
@@ -73,7 +73,24 @@ namespace Kaalcharakk.Controllers
         }
 
 
-        [HttpGet("all-users")]
+
+        [HttpGet("my/details")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> FetchMyDetails()
+        {
+            var userId = Convert.ToInt32(HttpContext.Items["UserId"]);
+            var response = await _userService.FetchMyDetailsAsync(userId);
+            if (response.StatusCode == 200)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+
+
+
+        [HttpGet("allusers")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> FetchAllUsers()
         {

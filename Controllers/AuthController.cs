@@ -143,7 +143,7 @@ namespace Kaalcharakk.Controllers
 
 
 
-        [HttpPost("refresh-token")]
+        [HttpPost("refresh/token")]
         public async Task<IActionResult> RefreshToken()
         {
             try
