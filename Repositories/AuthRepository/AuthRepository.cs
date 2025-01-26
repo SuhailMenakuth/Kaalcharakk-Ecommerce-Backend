@@ -70,6 +70,7 @@ namespace Kaalcharakk.Repositories.AuthRepository
         public async Task<User?> GetUserByIdAsync(int userId)
         {
             return await _context.Users
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.UserId == userId);
         }
     }

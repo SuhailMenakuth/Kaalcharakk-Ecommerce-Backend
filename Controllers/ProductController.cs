@@ -90,7 +90,7 @@ namespace Kaalcharakk.Controllers
         
 
         [HttpGet("allactive/products")]
-        [Authorize]
+        
         public async Task<IActionResult> GetAllActiveProducts()
         {
             try

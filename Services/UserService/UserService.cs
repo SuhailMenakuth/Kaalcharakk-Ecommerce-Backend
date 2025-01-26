@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Core;
 using Kaalcharakk.Dtos.AdressDtos;
 using Kaalcharakk.Dtos.OrderDtos;
 using Kaalcharakk.Dtos.UserDtos;
@@ -130,14 +131,27 @@ namespace Kaalcharakk.Services.UserService
 
         public async Task<ApiResponse<MyDetailsDto>> FetchMyDetailsAsync(int userId)
         {
-            var myDetails = _userRepository.FetchUserByIdAsync(userId);
+            var user = await _userRepository.FetchUserByIdAsync(userId);
+            var userAdress = await _addressService.GetShippingAddressesAsync(userId);
 
-            var myDetailsDto = _mapper.Map<MyDetailsDto>(myDetails);
-            if(myDetails == null)
+            var myDetailsDto = new MyDetailsDto
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Phone = user.Phone,
+                ViewUserAddress = userAdress.Data
+
+            };
+
+
+
+            if (user == null)
             {
                 return new ApiResponse<MyDetailsDto>(404, "not found", error: "internal server error");
 
             }
+            //var myDetailsDto = _mapper.Map<MyDetailsDto>(myDetails);
             return new ApiResponse<MyDetailsDto>(200, "success", myDetailsDto);
         }
 

@@ -24,11 +24,6 @@ namespace Kaalcharakk.Controllers
             try
             {
 
-                //if (registerDto == null || string.IsNullOrEmpty(registerDto.Email) || string.IsNullOrEmpty(registerDto.PasswordHash))
-                //{
-                //    return BadRequest("Email and Password are required.");
-                //}
-
                 if(registerDto == null)
                 {
                     return BadRequest(new {message = "form are incomplete" });
@@ -111,19 +106,34 @@ namespace Kaalcharakk.Controllers
                 }
 
                 // Store the tokens in cookies
-                Response.Cookies.Append("accessToken", accessToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTime.UtcNow.AddMinutes(15)
-                });
+                //Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+                //{
+                //    HttpOnly = true,
+                //    Secure = true,
+                //    Expires = DateTime.UtcNow.AddMinutes(15)
+                //});
 
-                Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                //Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                //{
+                //    HttpOnly = true,
+                //    Secure = true,
+                //    Expires = DateTime.UtcNow.AddMonths(1)
+                //});
+
+
+                var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTime.UtcNow.AddMonths(1)
-                });
+                    Secure = true, // Use Secure only in non-local environments
+                    SameSite = SameSiteMode.None, // Required for cross-origin cookies
+                    Expires = DateTime.UtcNow.AddMinutes(15) // Adjust for access/refresh token
+                };
+
+                Response.Cookies.Append("accessToken", accessToken, cookieOptions);
+
+                cookieOptions.Expires = DateTime.UtcNow.AddMonths(1); // Update for refresh token
+                Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+
 
                 return Ok(new { message = "Login Successful", accessToken, refreshToken });
             }
@@ -132,15 +142,6 @@ namespace Kaalcharakk.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
             }
         }
-
-
-
-
-
-
-
-
-
 
 
         [HttpPost("refresh/token")]

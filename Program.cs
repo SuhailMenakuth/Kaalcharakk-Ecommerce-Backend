@@ -51,9 +51,9 @@ namespace Kaalcharakk
                     builder =>
                     {
                         builder.WithOrigins("http://localhost:5173")
+                               .AllowCredentials()
                                .AllowAnyMethod()
-                               .AllowAnyHeader()
-                               .AllowCredentials(); 
+                               .AllowAnyHeader(); 
 
                     });
             });
@@ -157,6 +157,10 @@ namespace Kaalcharakk
                 };
             });
 
+
+           
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -170,6 +174,7 @@ namespace Kaalcharakk
             app.UseCors("AllowSpecificOrigin");
 
             // Add authentication before authorization
+            app.UseMiddleware<TokenCookieMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseMiddleware<UserIdentificationMiddleWare>();

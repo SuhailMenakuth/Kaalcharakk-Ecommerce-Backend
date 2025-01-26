@@ -19,9 +19,14 @@ namespace Kaalcharakk.Mapper
             CreateMap<ViewAddressDto , ShippingAddress>().ReverseMap();
             CreateMap<OrderViewDto , Order>().ReverseMap();
             CreateMap<UserViewDto, User>().ReverseMap();
-            CreateMap<MyDetailsDto, User>().ReverseMap();
+            CreateMap<User, MyDetailsDto>()
+     .ForMember(dest => dest.ViewUserAddress, opt => opt.MapFrom(src => src.ShippingAddresses))
+     .ForSourceMember(src => src.PasswordHash, opt => opt.DoNotValidate()) // Exclude PasswordHash
+            .ForSourceMember(src => src.RoleId, opt => opt.DoNotValidate());
 
-           
+            CreateMap<ShippingAddress, ViewAddressDto>().ReverseMap();
+
+
         }   
     }
 }
