@@ -20,6 +20,7 @@ namespace Kaalcharakk.Services.CartService
         public async Task<CartResponseDto> GetCartAsync(int userId)
         {
             var cart = await _cartRepository.GetCartByUserIdAsync(userId);
+           Console.WriteLine(cart);
             if (cart == null) return null;
 
             var response = new CartResponseDto

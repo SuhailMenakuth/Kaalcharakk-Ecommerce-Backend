@@ -20,10 +20,6 @@ namespace Kaalcharakk.Dtos.ProductDtos
 
         public int Stock { get; set; }
 
-        public decimal Offer { get; set; } 
-        public DateTime? OfferStartingDate { get; set; } 
-
-        public DateTime? OfferEndingDate { get; set; } 
         public bool IsActive { get; set; } = true;
 
     }

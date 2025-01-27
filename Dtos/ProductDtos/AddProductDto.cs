@@ -17,11 +17,7 @@ namespace Kaalcharakk.Dtos.ProductDtos
         [Required]
         public string Color { get; set; }
         
-        public decimal Offer { get; set; } = 0;
-
-        public DateTime? OfferStartingDate { get; set; } = DateTime.UtcNow;
-
-        public DateTime? OfferEndingDate { get; set; } = DateTime.UtcNow;
+       
         
 
     }

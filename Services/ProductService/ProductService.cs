@@ -44,7 +44,7 @@ namespace Kaalcharakk.Services.ProductService
                 var result = await _productRepository.AddProductAsync(product);
                 if (result != null)
                 {  
-                return new ApiResponse<string>(200,"success" ,error: "Producted added succesfully");   
+                return new ApiResponse<string>(200,"success" ,data: "Producted added succesfully");   
                 }
 
                     return new ApiResponse<string>(500, "internal server error  ", error: "error occured during the updation of the database");
