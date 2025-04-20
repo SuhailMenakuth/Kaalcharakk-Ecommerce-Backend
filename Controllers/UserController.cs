@@ -16,8 +16,6 @@ namespace Kaalcharakk.Controllers
             _userService = userService;
         }
 
-        //var userId = int.Parse(HttpContext.Items["UserId"].ToString());
-
         [HttpPatch("block/user")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> BlockUser(int userId)

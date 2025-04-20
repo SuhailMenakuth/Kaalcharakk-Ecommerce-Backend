@@ -18,12 +18,6 @@ using Kaalcharakk.Services.OrderService;
 using Kaalcharakk.Services.ProductService;
 using Kaalcharakk.Services.UserService;
 using Kaalcharakk.Services.WishlistServices;
-
-
-
-
-//using Kaalcharakk.Repositories.AuthRepository;
-//using Kaalcharakk.Services.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -37,8 +31,6 @@ namespace Kaalcharakk
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
             builder.Services.AddDbContext<KaalcharakkDbContext>(options =>
                   options.UseSqlServer(
                         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -62,33 +54,32 @@ namespace Kaalcharakk
 
 
             builder.Services.AddAutoMapper(typeof(MapperProfile));
-            //builder.Services.AddLogging();
+            builder.Services.AddScoped<ICloudinaryHelper, CloudinaryHelper>();
+            builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+            builder.Services.AddScoped<IRazorpayHelper, RazorpayHelper>();
+
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IWishlistService, WishlistService>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-            builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<IJwtHelper, JwtHelper>();
-            builder.Services.AddScoped<ICloudinaryHelper, CloudinaryHelper>();
             builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<ICartRepository, CartRepository>();
-            builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
-            builder.Services.AddScoped<IWishlistService, WishlistService>();
             builder.Services.AddScoped<IAddressRepository, AddressRepository>();
-            builder.Services.AddScoped<IAddressService, AddressService>();
-
-
-            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-            builder.Services.AddScoped<IRazorpayHelper, RazorpayHelper>();
             builder.Services.AddScoped<IUserRepositoy ,UserRepository>();
-            builder.Services.AddScoped<IUserService, UserService>();
+
+
 
 
             builder.Services.AddLogging();
             builder.Services.AddControllers();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
@@ -120,23 +111,10 @@ namespace Kaalcharakk
 
 
 
-
-
-
-
-
-
-            // User Secrets configuration (only for local development)
             builder.Configuration.AddUserSecrets<Program>();
-
-            // JWT Configuration      
-            //var jwtSettings = builder.Configuration.GetSection("Jwt");
             var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]);
             var audience = builder.Configuration["Jwt:Audience"];
             var issuer = builder.Configuration["Jwt:Issuer"];
-
-
-            // Configure JWT Authentication
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -153,27 +131,17 @@ namespace Kaalcharakk
                     ValidIssuer = issuer,
                     ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(secretKey),
-                    ClockSkew = TimeSpan.Zero // Optional: Removes the default 5-minute clock skew
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
-
-           
-
-
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            //app.UseHttpsRedirection();
             app.UseCors("AllowSpecificOrigin");
-
-            // Add authentication before authorization
             app.UseMiddleware<TokenCookieMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();

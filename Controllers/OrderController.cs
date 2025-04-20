@@ -40,13 +40,6 @@ namespace Kaalcharakk.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "An error occurred while placing the order.", error = ex.Message });
-                //var errorResponse = new
-                //{
-                //    message = "An error occurred while processing the order.",
-                //    error = ex.Message,  // Include the exception message
-                //    stackTrace = ex.StackTrace  // Optionally include the stack trace for debugging
-                //};
-               // return StatusCode(500, errorResponse);
             }
         }
 
@@ -72,13 +65,6 @@ namespace Kaalcharakk.Controllers
             }
         }
 
-
-        //[HttpPatch("update-orderstatus")]
-        //[Authorize(Roles = "Admin")]
-        //public async Task<IActionResult> UpdateOrderStatus(int orderId , OrderStatus orderstatus)
-        //{
-
-        //}
 
         [HttpGet("retrive/order/{orderId}")]
         [Authorize(Roles = "Admin")]

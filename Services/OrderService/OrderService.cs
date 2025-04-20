@@ -90,7 +90,6 @@ namespace Kaalcharakk.Services.OrderService
                 }).ToList()
             }).ToList();
 
-            //return _mapper.Map<List<OrderViewDto>>(orders);
             return orderViewDtos;
 
         }
@@ -104,8 +103,6 @@ namespace Kaalcharakk.Services.OrderService
                 return new ApiResponse<OrderViewDto>(404,"order canot found ");
             }
 
-            //var order = _mapper.Map<OrderViewDto>(res);
-
             var orderView = new OrderViewDto
             {
                 TransactionId = res.TransactionId,
@@ -116,8 +113,6 @@ namespace Kaalcharakk.Services.OrderService
                 OrderDate = res.OrderDate,
                 Items = res.OrderItems?.Select(oi => new OrderItemDto
                 {
-                    //ProductName = oi.Product?.Name 
-                    //?? "Unknown Product", 
                     ProductName = oi.Product.Name,
 
                     Quantity = oi.Quantity,
@@ -289,7 +284,6 @@ namespace Kaalcharakk.Services.OrderService
             catch (Exception ex)
             {
                 throw;
-                    //new Exception($"Service error: {ex.Message}", ex); 
             }
         }
 
@@ -325,7 +319,6 @@ namespace Kaalcharakk.Services.OrderService
             catch (Exception ex)
             {
                 throw;
-                //new Exception($"Service error: {ex.Message}", ex); 
             }
         }
 
@@ -360,7 +353,6 @@ namespace Kaalcharakk.Services.OrderService
             catch (Exception ex)
             {
                 throw;
-                //new Exception($"Service error: {ex.Message}", ex); 
             }
         }
 
@@ -396,7 +388,6 @@ namespace Kaalcharakk.Services.OrderService
             catch (Exception ex)
             {
                 throw;
-                //new Exception($"Service error: {ex.Message}", ex); 
             }
         }
 

@@ -29,7 +29,7 @@ namespace Kaalcharakk.Controllers
                 var cart = await _cartService.GetCartAsync(userId);
                 if (cart == null)
                 {
-                    //return StatusCode(204,new ApiResponse<object>(204, "no content"));
+                    
                     return StatusCode(202, new ApiResponse<CartResponseDto>(202,"request is succes full but cart not foundd ",  error :"add product to cart first "));
                 }
 
@@ -91,19 +91,7 @@ namespace Kaalcharakk.Controllers
 
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             var response = await _cartService.UpdateItemQuantityAsync(userId, productId, increase: true);
-            if(response.StatusCode == 422)
-            {
-                StatusCode(422, response);
-
-            }
-            if(response.StatusCode == 404)
-            {
-                return NotFound(response);
-            }
-            if(response.StatusCode == 400)
-            {
-                return BadRequest(response);
-            }
+           
             return Ok(response);
             }
             catch (Exception ex)
@@ -160,7 +148,7 @@ namespace Kaalcharakk.Controllers
             }
             return Ok(response);
 
-            //return Ok(new ApiResponse<string>(200, "All items have been removed from the cart."));
+       
         }
     }
 

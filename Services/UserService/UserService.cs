@@ -104,26 +104,22 @@ namespace Kaalcharakk.Services.UserService
         {
             try
             {
-                // Fetch all users from the repository
+
                 var users = await _userRepository.FetchAllUserAsync();
 
-                // Check if users are found
                 if (users == null || !users.Any())
                 {
                     return new ApiResponse<List<UserViewDto>>(404, "error", error: "there is no users");
                     
                 }
 
-                // Map users to UserViewDto
                 var userDtos = _mapper.Map<List<UserViewDto>>(users);
 
-                // Return success response
                 return new ApiResponse<List<UserViewDto>>(200, "sucsses", userDtos);
               
             }
             catch (Exception ex)
             {
-                // Handle exceptions and return failure response
                 return new ApiResponse<List<UserViewDto>>(500,"internal server error");
                
             }
@@ -151,7 +147,6 @@ namespace Kaalcharakk.Services.UserService
                 return new ApiResponse<MyDetailsDto>(404, "not found", error: "internal server error");
 
             }
-            //var myDetailsDto = _mapper.Map<MyDetailsDto>(myDetails);
             return new ApiResponse<MyDetailsDto>(200, "success", myDetailsDto);
         }
 

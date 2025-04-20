@@ -1,4 +1,5 @@
-﻿using Kaalcharakk.Dtos.AuthenticationDtos;
+﻿using Azure.Core;
+using Kaalcharakk.Dtos.AuthenticationDtos;
 using Kaalcharakk.Services.Authentication;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -47,44 +48,6 @@ namespace Kaalcharakk.Controllers
         }
 
 
-        //og login
-        // [HttpPost("login")]
-        //public async Task<IActionResult> Login([FromBody] LoginDto logindto)
-        //{
-        //    try
-        //    {
-        //       if(logindto == null || string.IsNullOrEmpty(logindto.Username) || string.IsNullOrEmpty(logindto.Password))
-        //        {
-        //            return BadRequest(new { message = "Username and Password are required" });
-        //        }
-
-        //        var token = await _authService.LoginAsync(logindto);
-
-        //        if (string.IsNullOrEmpty(token))
-        //        {
-        //            return Unauthorized(new { message = "Invalid username or password....." });
-        //        }
-
-        //        return Ok(new { message ="Login Successful", token=token});
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        if (ex.Message == "you are blocked")
-        //        {
-        //            return StatusCode(StatusCodes.Status403Forbidden, new { message = "Your account is blocked. Please contact support." });
-        //        }
-        //        else if (ex.Message == "username or password is wrong")
-        //        {
-        //            return Unauthorized(new { message = "Invalid username or password" });
-        //        }
-
-        //        return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
-        //    }
-        //}
-
-
-
-        //pending
 
 
 
@@ -105,33 +68,20 @@ namespace Kaalcharakk.Controllers
                     return Unauthorized(new { message = "Invalid username or password" });
                 }
 
-                // Store the tokens in cookies
-                //Response.Cookies.Append("accessToken", accessToken, new CookieOptions
-                //{
-                //    HttpOnly = true,
-                //    Secure = true,
-                //    Expires = DateTime.UtcNow.AddMinutes(15)
-                //});
-
-                //Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-                //{
-                //    HttpOnly = true,
-                //    Secure = true,
-                //    Expires = DateTime.UtcNow.AddMonths(1)
-                //});
+               
 
 
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // Use Secure only in non-local environments
-                    SameSite = SameSiteMode.None, // Required for cross-origin cookies
-                    Expires = DateTime.UtcNow.AddMinutes(15) // Adjust for access/refresh token
+                    Secure = true, 
+                    SameSite = SameSiteMode.None, 
+                    Expires = DateTime.UtcNow.AddMinutes(15) 
                 };
 
                 Response.Cookies.Append("accessToken", accessToken, cookieOptions);
 
-                cookieOptions.Expires = DateTime.UtcNow.AddMonths(1); // Update for refresh token
+                cookieOptions.Expires = DateTime.UtcNow.AddMonths(1); 
                 Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
 
 
@@ -157,13 +107,15 @@ namespace Kaalcharakk.Controllers
 
                 var newAccessToken = await _authService.RefreshTokenAsync(refreshToken);
 
-                // Set new access token in cookies
-                Response.Cookies.Append("accessToken", newAccessToken, new CookieOptions
+                var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTime.UtcNow.AddMinutes(15)
-                });
+                    Secure = true, 
+                    SameSite = SameSiteMode.None, 
+                    Expires = DateTime.UtcNow.AddMinutes(15) 
+                };
+
+                Response.Cookies.Append("accessToken", newAccessToken, cookieOptions);
 
                 return Ok(new { message = "Token refreshed successfully", accessToken = newAccessToken });
             }

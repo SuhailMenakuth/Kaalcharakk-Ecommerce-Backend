@@ -31,9 +31,6 @@ namespace Kaalcharakk.Services.AddressService
                 }
 
 
-
-                // A user can have atmost 3 address
-
                 var addressCount = await _addressRepository.GetShippingAdressCount(userId);
 
                 if (addressCount >= 3)
@@ -45,8 +42,6 @@ namespace Kaalcharakk.Services.AddressService
 
                 var newAddress = _mapper.Map<ShippingAddress>(orderAddressDTO);
                 newAddress.UserId = userId;
-                //await _context.ShippingAddresses.AddAsync(newAddress);
-                //await _context.SaveChangesAsync();
                 await _addressRepository.CreateAddressAsync(newAddress);
                 return new ApiResponse<int>(200, "Successfully Created Shipping Address", newAddress.Id);
             }

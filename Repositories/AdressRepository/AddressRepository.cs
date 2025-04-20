@@ -34,28 +34,6 @@ namespace Kaalcharakk.Repositories.AdressRepository
             return true;
         }
 
-        //public async Task<Address> GetAddressAsync(int addressId)
-        //{
-        //    return await _context.Addresses.FindAsync(addressId);
-        //}
-
-        //public async Task<bool> UpdateAddressAsync(Address address)
-        //{
-        //    _context.Addresses.Update(address);
-        //    return await _context.SaveChangesAsync() > 0;
-        //}
-
-        //public async Task<bool> DeleteAddressAsync(int addressId)
-        //{
-        //    var address = await _context.Addresses.FindAsync(addressId);
-        //    if (address != null)
-        //    {
-        //        _context.Addresses.Remove(address);
-        //        return await _context.SaveChangesAsync() > 0;
-        //    }
-        //    return false;
-        //}
-
 
         public async Task<int> GetShippingAdressCount(int UId)
         {

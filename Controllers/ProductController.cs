@@ -101,7 +101,6 @@ namespace Kaalcharakk.Controllers
             }
             catch (Exception ex)
             {
-              //  return StatusCode(500, new { ex.Message });
               return StatusCode(500, ex);
             }
 
@@ -190,10 +189,6 @@ namespace Kaalcharakk.Controllers
         {
             try
             {
-                //if (!ModelState.IsValid)
-                //{
-                //    return BadRequest(new ApiResponse<string>(400, "Invalid request data"));
-                //}
 
                 var result = await _productService.UpdateProductServiceAsync(productId, updateProductDto, newImage);
 

@@ -20,6 +20,7 @@ namespace Kaalcharakk.Repositories.CartRepository
             return await _context.Carts
                 .Include(c => c.Items)
                 .ThenInclude(i => i.Product)
+                .ThenInclude(c => c.Category)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
         }
 

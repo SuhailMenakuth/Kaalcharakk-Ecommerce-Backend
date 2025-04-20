@@ -25,8 +25,6 @@ namespace Kaalcharakk.Controllers
 
             var userId = int.Parse(HttpContext.Items["UserId"].ToString());
             var resposnse = await _wishlistService.GetWishlistAsync(userId);
-            if (resposnse.StatusCode == 404)
-                return NotFound(resposnse);
             return Ok(resposnse);
             }
             catch (Exception ex)

@@ -6,7 +6,7 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
     public interface IJwtHelper
     {
         string GenerateToken(User user);
-        string GenerateRefreshToken(); // pending
+        string GenerateRefreshToken();
         ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 
     }

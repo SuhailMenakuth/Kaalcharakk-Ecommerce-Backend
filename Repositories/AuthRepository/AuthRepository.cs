@@ -39,9 +39,6 @@ namespace Kaalcharakk.Repositories.AuthRepository
             await _context.SaveChangesAsync();
         }
 
-        //pending 
-
-
         public async Task SaveRefreshTokenAsync(int userId, string refreshToken, DateTime expiryDate)
         {
             var existingToken = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.UserId == userId);

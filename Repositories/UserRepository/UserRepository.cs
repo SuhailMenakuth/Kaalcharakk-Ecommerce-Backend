@@ -22,11 +22,6 @@ namespace Kaalcharakk.Repositories.UserRepository
             {
 
             return await _context.Users
-                //.Include(u => u.Role)
-                //.Include(u => u.ShippingAddresses)// changed 
-                //.Include(u => u.Orders)
-                //.ThenInclude(o => o.OrderItems)
-                //.ThenInclude(p => p.Product)
                 .FirstOrDefaultAsync(u => u.UserId == userid);
             }
             catch(Exception ex)

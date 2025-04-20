@@ -69,11 +69,6 @@ namespace Kaalcharakk.Services.ProductService
                     return new ApiResponse<ProductViewDto>(400, "error",error: "Cant find a product with this id");
 
                 }
-                //var result = _mapper.Map<ProductViewDto>(RetrivedProduct);
-                //if (result == null)
-                //{
-                //    return new ApiResponse<ProductViewDto>(500, "internal server error", error: "retrived product mapping failed ");
-                //}
                 var result = new ProductViewDto
                 {
                     ProductId = RetrivedProduct.ProductId,
@@ -91,7 +86,6 @@ namespace Kaalcharakk.Services.ProductService
             catch (Exception ex)
             {
                 throw;
-                //new Exception("An error occurred while fetching the product", ex);
             }
         }
 
@@ -99,7 +93,6 @@ namespace Kaalcharakk.Services.ProductService
         {
             try
             {
-                //List<ProductViewDto> products = new List<ProductViewDto>();
 
                  var products  = await _productRepository.GetAllProductsAsync();
 

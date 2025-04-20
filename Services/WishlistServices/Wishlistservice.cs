@@ -19,8 +19,6 @@ namespace Kaalcharakk.Services.WishlistServices
             _cartRepository = cartRepository;
             _productRepository = productRepository;
         }
-
-        // Get wishlist for the user
         public async Task<ApiResponse<WishlistResponseDto>> GetWishlistAsync(int userId)
         {
             try
@@ -49,7 +47,6 @@ namespace Kaalcharakk.Services.WishlistServices
             }
         }
 
-        // Add item to the wishlist
         public async Task<ApiResponse<string>> AddItemAsync(int userId, int productId)
         {
             try
@@ -83,8 +80,6 @@ namespace Kaalcharakk.Services.WishlistServices
                 throw new Exception($"internal exception {ex.Message}", ex);
             }
         }
-
-        // Move item to cart
         public async Task<ApiResponse<string>> MoveToCartAsync(int userId, int productId)
         {
             try
@@ -96,14 +91,6 @@ namespace Kaalcharakk.Services.WishlistServices
 
             var wishlistItem = wishlist.Items.FirstOrDefault(item => item.ProductId == productId);
             if (wishlistItem == null) return new ApiResponse<string>(404, "not found", error: "your wishlist is empty");
-             
-
-
-            // Remove from wishlist
-            //wishlist.Items.Remove(wishlistItem);
-            //await _wishlistRepository.UpdateWishlistAsync(wishlist);
-
-            // Add to cart
             var cart = await _cartRepository.GetCartByUserIdAsync(userId)
                        ?? await _cartRepository.CreateCartAsync(userId);
 
@@ -129,8 +116,6 @@ namespace Kaalcharakk.Services.WishlistServices
                 throw new Exception($"internal exception {ex.Message}", ex);
             }
         }
-
-        // Remove item from the wishlist
         public async Task<ApiResponse<string>> RemoveItemAsync(int userId, int productId)
         {
             try
@@ -156,7 +141,6 @@ namespace Kaalcharakk.Services.WishlistServices
             }
         }
 
-        // Remove all items from the wishlist
         public async Task<ApiResponse<string>> RemoveAllItemsAsync(int userId)
         {
             try

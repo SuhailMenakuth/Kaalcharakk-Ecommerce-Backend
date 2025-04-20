@@ -10,8 +10,5 @@ namespace Kaalcharakk.Repositories.AdressRepository
         Task<User?> GetUserWithShippingAddressesAsync(int userId);
         Task<bool> RemoveShippingAddressAsync(User user, ShippingAddress address);
 
-
-
-
     }
 }

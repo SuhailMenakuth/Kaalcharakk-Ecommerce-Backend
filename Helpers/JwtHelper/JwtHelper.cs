@@ -23,7 +23,7 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
         {
             try
             {
-                // Validate required configuration settings
+                
                 var secretKey = _configuration["Jwt:SecretKey"];
                 var issuer = _configuration["Jwt:Issuer"];
                 var audience = _configuration["Jwt:Audience"];
@@ -35,23 +35,21 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
                     throw new Exception($"Missing JWT configuration values. SecretKey: {secretKey}, Issuer: {issuer}, Audience: {audience}");
                 }
 
-                // Generate the security key and credentials
                 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
                 var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                // Define claims
                 var claims = new[]
                 {
                
-                    new Claim(ClaimTypes.Role, user.Role.RoleName),      // user role (role name)
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
+                    new Claim(ClaimTypes.Role, user.Role.RoleName),     
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), 
 
-                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // user ID (user identifier)
-                    new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName), // user's full name
-                    new Claim(ClaimTypes.Email, user.Email), // user's email (email claim)
+                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), 
+                    new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
+                    new Claim(ClaimTypes.Email, user.Email),
                         };
 
-                // Create the token
+              
                 var token = new JwtSecurityToken(
                     issuer: issuer,
                     audience: audience,
@@ -64,12 +62,11 @@ namespace Kaalcharakk.Helpers.JwtHelper.JwtHelper
             }
             catch (Exception ex)
             {
-                // Log the exception (you can implement a logger here)
+               
                 throw new Exception("An error occurred while generating the token.", ex);
             }
         }
 
-        // pending
         public string GenerateRefreshToken()
         {
             var randomBytes = new byte[64];
